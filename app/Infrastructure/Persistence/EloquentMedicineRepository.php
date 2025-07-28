@@ -5,6 +5,7 @@ namespace App\Infrastructure\Persistence;
 use App\Domain\Medicine\Entities\Medicine;
 use App\Domain\Medicine\Repositories\MedicineRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 
 class EloquentMedicineRepository implements MedicineRepositoryInterface
 {
@@ -13,37 +14,47 @@ class EloquentMedicineRepository implements MedicineRepositoryInterface
         return Medicine::find($id);
     }
     
-    public function findByCode(string $code): ?Medicine
+    public function findByCategory(int $categoryId): Collection
     {
-        return Medicine::where('code', $code)->first();
+        return Medicine::where('category_id', $categoryId)->get();
     }
     
     public function findByName(string $name): Collection
     {
-        return Medicine::where('name', 'like', "%{$name}%")->get();
-    }
-    
-    public function findByCategory(string $category): Collection
-    {
-        return Medicine::where('category', $category)->get();
+        return Medicine::where('medicine_name', 'like', "%{$name}%")->get();
     }
     
     public function findActive(): Collection
     {
-        return Medicine::where('is_active', true)->get();
+        return Medicine::where('expired_at', '>', now())
+            ->orWhereNull('expired_at')
+            ->get();
     }
     
-    public function findLowStock(): Collection
+    public function findInactive(): Collection
     {
-        return Medicine::whereRaw('stock_quantity <= min_stock_level')
-            ->where('is_active', true)
-            ->get();
+        return Medicine::where('expired_at', '<=', now())->get();
+    }
+    
+    public function findLowStock(int $threshold = 10): Collection
+    {
+        return Medicine::where('stock', '<=', $threshold)->get();
     }
     
     public function findOutOfStock(): Collection
     {
-        return Medicine::where('stock_quantity', 0)
-            ->where('is_active', true)
+        return Medicine::where('stock', '<=', 0)->get();
+    }
+    
+    public function findExpired(): Collection
+    {
+        return Medicine::where('expired_at', '<', now())->get();
+    }
+    
+    public function findExpiringSoon(int $days = 30): Collection
+    {
+        return Medicine::where('expired_at', '>=', now())
+            ->where('expired_at', '<=', now()->addDays($days))
             ->get();
     }
     
@@ -65,53 +76,64 @@ class EloquentMedicineRepository implements MedicineRepositoryInterface
     
     public function search(string $query): Collection
     {
-        return Medicine::where(function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")
-              ->orWhere('code', 'like', "%{$query}%")
-              ->orWhere('description', 'like', "%{$query}%");
-        })->get();
+        return Medicine::where('medicine_name', 'like', "%{$query}%")
+            ->orWhere('description', 'like', "%{$query}%")
+            ->get();
     }
     
-    public function getBySupplier(int $supplierId): Collection
+    public function getByPriceRange(float $minPrice, float $maxPrice): Collection
     {
-        return Medicine::where('supplier_id', $supplierId)->get();
+        return Medicine::whereBetween('price', [$minPrice, $maxPrice])->get();
     }
-
-    public function findPublicMedicines(string $search = '', string $category = ''): Collection
+    
+    public function getByStockRange(int $minStock, int $maxStock): Collection
     {
-        $query = Medicine::where('is_active', true)
-            ->where('stock_quantity', '>', 0);
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
-            });
+        return Medicine::whereBetween('stock', [$minStock, $maxStock])->get();
+    }
+    
+    public function updateStock(int $medicineId, int $quantity): bool
+    {
+        $medicine = $this->findById($medicineId);
+        if (!$medicine) {
+            return false;
         }
-
-        if ($category) {
-            $query->where('category', $category);
-        }
-
-        return $query->orderBy('name')->get();
+        
+        $medicine->updateStock($quantity);
+        return true;
     }
-
-    public function getCategories(): array
+    
+    public function getTotalStock(): int
     {
-        return Medicine::where('is_active', true)
-            ->distinct()
-            ->pluck('category')
-            ->filter()
-            ->toArray();
+        return Medicine::sum('stock');
     }
-
-    public function findFeatured(): Collection
+    
+    public function getAveragePrice(): float
     {
-        return Medicine::where('is_active', true)
-            ->where('stock_quantity', '>', 0)
-            ->orderBy('stock_quantity', 'desc')
-            ->take(8)
+        return Medicine::avg('price') ?? 0;
+    }
+    
+    public function getMostExpensive(): ?Medicine
+    {
+        return Medicine::orderBy('price', 'desc')->first();
+    }
+    
+    public function getLeastExpensive(): ?Medicine
+    {
+        return Medicine::orderBy('price', 'asc')->first();
+    }
+    
+    public function getTopSelling(int $limit = 10): Collection
+    {
+        return Medicine::select('medicines.*')
+            ->leftJoin('sales_transaction_details', 'medicines.id', '=', 'sales_transaction_details.product_id')
+            ->groupBy('medicines.id')
+            ->orderByRaw('SUM(sales_transaction_details.quantity) DESC')
+            ->limit($limit)
             ->get();
+    }
+    
+    public function getLowestStock(int $limit = 10): Collection
+    {
+        return Medicine::orderBy('stock', 'asc')->limit($limit)->get();
     }
 } 

@@ -11,6 +11,8 @@ interface UserRepositoryInterface
     
     public function findByEmail(string $email): ?User;
     
+    public function findByUsername(string $username): ?User;
+    
     public function findByRole(string $role): Collection;
     
     public function findActive(): Collection;
@@ -27,7 +29,25 @@ interface UserRepositoryInterface
     
     public function getAdmins(): Collection;
     
-    public function getApotekers(): Collection;
+    public function getPharmacists(): Collection;
     
-    public function getPelanggans(): Collection;
+    public function getBuyers(): Collection;
+    
+    public function getSuppliers(): Collection;
+    
+    public function getUsersByRole(array $roles): Collection;
+    
+    public function getUsersWithTransactions(): Collection;
+    
+    public function getTopBuyers(int $limit = 10): Collection;
+    
+    public function getTopSellers(int $limit = 10): Collection;
+    
+    public function getUsersByDateRange(string $startDate, string $endDate): Collection;
+    
+    public function getActiveUsersCount(): int;
+    
+    public function getInactiveUsersCount(): int;
+    
+    public function getUsersCountByRole(string $role): int;
 } 
