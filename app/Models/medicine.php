@@ -5,9 +5,9 @@ namespace App\Models;
 use App\Domain\Medicine\Entities\Medicine as MedicineEntity;
 
 /**
- * @deprecated Use App\Domain\Medicine\Entities\Medicine instead
+ * Medicine Model - Alias untuk Medicine Entity
  */
 class medicine extends MedicineEntity
 {
-    //
+    // Tidak perlu mendefinisikan relasi lagi karena sudah ada di Entity
 }
