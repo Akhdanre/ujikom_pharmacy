@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Domain\Transaction\Entities\TransactionDetail as TransactionDetailEntity;
 
-class detail_transaksi extends Model
+/**
+ * @deprecated Use App\Domain\Transaction\Entities\TransactionDetail instead
+ */
+class detail_transaksi extends TransactionDetailEntity
 {
     //
 }

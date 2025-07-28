@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Domain\Medicine\Entities\Medicine as MedicineEntity;
 
-class medicine extends Model
+/**
+ * @deprecated Use App\Domain\Medicine\Entities\Medicine instead
+ */
+class medicine extends MedicineEntity
 {
     //
 }
