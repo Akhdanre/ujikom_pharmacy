@@ -3,31 +3,27 @@
 namespace App\Domain\Medicine\Entities;
 
 use App\Domain\Medicine\ValueObjects\MedicineName;
-use App\Domain\Medicine\ValueObjects\MedicineCode;
 use App\Domain\Medicine\ValueObjects\Price;
-use App\Domain\Medicine\ValueObjects\StockQuantity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Medicine extends Model
 {
     protected $fillable = [
-        'code',
-        'name',
+        'medicine_name',
         'description',
-        'category',
         'price',
-        'stock_quantity',
-        'min_stock_level',
-        'supplier_id',
-        'is_active'
+        'stock',
+        'category_id',
+        'image_url',
+        'expired_at'
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
-        'stock_quantity' => 'integer',
-        'min_stock_level' => 'integer',
-        'is_active' => 'boolean',
+        'stock' => 'integer',
+        'expired_at' => 'datetime',
     ];
 
     public function __construct(array $attributes = [])
@@ -38,32 +34,46 @@ class Medicine extends Model
     // Business Logic Methods
     public function isLowStock(): bool
     {
-        return $this->stock_quantity <= $this->min_stock_level;
+        return $this->stock <= 10; // Default minimum stock level
     }
 
     public function isOutOfStock(): bool
     {
-        return $this->stock_quantity <= 0;
+        return $this->stock <= 0;
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->expired_at && $this->expired_at->isPast();
+    }
+
+    public function isExpiringSoon(int $days = 30): bool
+    {
+        if (!$this->expired_at) {
+            return false;
+        }
+        
+        return $this->expired_at->diffInDays(now()) <= $days;
     }
 
     public function canSell(int $quantity): bool
     {
-        return $this->is_active && $this->stock_quantity >= $quantity;
+        return !$this->isExpired() && $this->stock >= $quantity;
     }
 
     public function reduceStock(int $quantity): void
     {
-        if ($this->stock_quantity < $quantity) {
+        if ($this->stock < $quantity) {
             throw new \InvalidArgumentException('Insufficient stock');
         }
         
-        $this->stock_quantity -= $quantity;
+        $this->stock -= $quantity;
         $this->save();
     }
 
     public function addStock(int $quantity): void
     {
-        $this->stock_quantity += $quantity;
+        $this->stock += $quantity;
         $this->save();
     }
 
@@ -77,26 +87,77 @@ class Medicine extends Model
         $this->save();
     }
 
-    public function deactivate(): void
+    public function updateStock(int $newStock): void
     {
-        $this->is_active = false;
+        if ($newStock < 0) {
+            throw new \InvalidArgumentException('Stock cannot be negative');
+        }
+        
+        $this->stock = $newStock;
         $this->save();
     }
 
-    public function activate(): void
+    public function updateExpiryDate(\DateTime $expiryDate): void
     {
-        $this->is_active = true;
+        $this->expired_at = $expiryDate;
         $this->save();
+    }
+
+    public function updateImageUrl(string $imageUrl): void
+    {
+        $this->image_url = $imageUrl;
+        $this->save();
+    }
+
+    public function getDisplayName(): string
+    {
+        return $this->medicine_name;
+    }
+
+    public function getFormattedPrice(): string
+    {
+        return 'Rp ' . number_format($this->price, 0, ',', '.');
+    }
+
+    public function getStockStatus(): string
+    {
+        if ($this->isOutOfStock()) {
+            return 'Out of Stock';
+        }
+        
+        if ($this->isLowStock()) {
+            return 'Low Stock';
+        }
+        
+        return 'In Stock';
+    }
+
+    public function getStockStatusColor(): string
+    {
+        if ($this->isOutOfStock()) {
+            return 'red';
+        }
+        
+        if ($this->isLowStock()) {
+            return 'orange';
+        }
+        
+        return 'green';
     }
 
     // Relationships
-    public function transactionDetails(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(\App\Domain\Transaction\Entities\TransactionDetail::class);
+        return $this->belongsTo(\App\Domain\Category\Entities\Category::class);
     }
 
-    public function supplier()
+    public function purchaseTransactionDetails(): HasMany
     {
-        return $this->belongsTo(\App\Domain\Inventory\Entities\Supplier::class);
+        return $this->hasMany(\App\Domain\Purchase\Entities\PurchaseTransactionDetail::class, 'product_id');
+    }
+
+    public function salesTransactionDetails(): HasMany
+    {
+        return $this->hasMany(\App\Domain\Sales\Entities\SalesTransactionDetail::class, 'product_id');
     }
 } 

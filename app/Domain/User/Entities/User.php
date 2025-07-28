@@ -14,6 +14,7 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $fillable = [
+        'username',
         'name',
         'email',
         'password',
@@ -41,14 +42,19 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
-    public function isApoteker(): bool
+    public function isPharmacist(): bool
     {
-        return $this->role === 'apoteker';
+        return $this->role === 'pharmacist';
     }
 
-    public function isPelanggan(): bool
+    public function isBuyer(): bool
     {
-        return $this->role === 'users_pelanggan';
+        return $this->role === 'buyer';
+    }
+
+    public function isSupplier(): bool
+    {
+        return $this->role === 'supplier';
     }
 
     public function hasRole(string $role): bool
@@ -63,22 +69,32 @@ class User extends Authenticatable
 
     public function canAccessAdminPanel(): bool
     {
-        return $this->hasAnyRole(['admin', 'apoteker']);
+        return $this->hasAnyRole(['admin', 'pharmacist']);
     }
 
     public function canManageMedicines(): bool
     {
-        return $this->hasAnyRole(['admin', 'apoteker']);
+        return $this->hasAnyRole(['admin', 'pharmacist']);
     }
 
     public function canManageTransactions(): bool
     {
-        return $this->hasAnyRole(['admin', 'apoteker']);
+        return $this->hasAnyRole(['admin', 'pharmacist']);
     }
 
     public function canViewReports(): bool
     {
-        return $this->hasAnyRole(['admin', 'apoteker']);
+        return $this->hasAnyRole(['admin', 'pharmacist']);
+    }
+
+    public function canPurchase(): bool
+    {
+        return $this->hasAnyRole(['admin', 'pharmacist', 'buyer']);
+    }
+
+    public function canSell(): bool
+    {
+        return $this->hasAnyRole(['admin', 'pharmacist']);
     }
 
     public function activate(): void
@@ -100,7 +116,7 @@ class User extends Authenticatable
 
     public function updateRole(string $newRole): void
     {
-        $validRoles = ['admin', 'apoteker', 'users_pelanggan'];
+        $validRoles = ['admin', 'pharmacist', 'buyer', 'supplier'];
         
         if (!in_array($newRole, $validRoles)) {
             throw new \InvalidArgumentException('Invalid role');
@@ -112,7 +128,7 @@ class User extends Authenticatable
 
     public function updateProfile(array $data): void
     {
-        $allowedFields = ['name', 'phone', 'address'];
+        $allowedFields = ['username', 'name', 'phone', 'address'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
@@ -135,15 +151,16 @@ class User extends Authenticatable
 
     public function getDisplayName(): string
     {
-        return $this->name ?? $this->email;
+        return $this->name ?? $this->username ?? $this->email;
     }
 
     public function getRoleDisplayName(): string
     {
         return match($this->role) {
             'admin' => 'Administrator',
-            'apoteker' => 'Apoteker',
-            'users_pelanggan' => 'Pelanggan',
+            'pharmacist' => 'Pharmacist',
+            'buyer' => 'Buyer',
+            'supplier' => 'Supplier',
             default => 'Unknown'
         };
     }
@@ -152,20 +169,21 @@ class User extends Authenticatable
     {
         return match($this->role) {
             'admin' => 'red',
-            'apoteker' => 'blue',
-            'users_pelanggan' => 'green',
+            'pharmacist' => 'blue',
+            'buyer' => 'green',
+            'supplier' => 'orange',
             default => 'gray'
         };
     }
 
     // Relationships
-    public function transactions(): HasMany
+    public function purchaseTransactions(): HasMany
     {
-        return $this->hasMany(\App\Domain\Transaction\Entities\Transaction::class);
+        return $this->hasMany(\App\Domain\Purchase\Entities\PurchaseTransaction::class);
     }
 
-    public function customers(): HasMany
+    public function salesTransactions(): HasMany
     {
-        return $this->hasMany(\App\Domain\Customer\Entities\Customer::class);
+        return $this->hasMany(\App\Domain\Sales\Entities\SalesTransaction::class);
     }
 } 
