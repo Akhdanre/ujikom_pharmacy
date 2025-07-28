@@ -1,8 +1,8 @@
 <?php
 
-use App\Livewire\Medicine\MedicineIndex;
-use App\Livewire\Auth\Login;
-use App\Livewire\Auth\Register;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 use App\Presentation\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,8 +12,15 @@ Route::get('/medicine/{id}', [HomeController::class, 'show'])->name('medicine.de
 Route::get('/category/{category}', [HomeController::class, 'category'])->name('category');
 
 // Auth Routes
-Route::get('/login', Login::class)->name('login');
-Route::get('/register', Register::class)->name('register');
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [LoginController::class, 'login']);
+    
+    Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
+    Route::post('/register', [RegisterController::class, 'register']);
+});
+
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware([
     'auth:sanctum',
@@ -25,8 +32,8 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 
-    // DDD Medicine Routes
-    Route::get('/medicines', MedicineIndex::class)->name('medicines.index');
+    // Medicine Routes
+    Route::resource('medicines', MedicineController::class);
 });
 
 require __DIR__.'/auth.php';
