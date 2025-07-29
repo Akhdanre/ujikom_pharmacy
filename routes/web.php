@@ -1,11 +1,10 @@
 <?php
 
 use App\Presentation\Controllers\Web\MedicineController;
-use App\Presentation\Controllers\Web\TransactionController;
+use App\Presentation\Controllers\Web\SellTransactionController;
 use App\Presentation\Controllers\Web\BuyTransactionController;
 use App\Presentation\Controllers\Auth\LoginController;
 use App\Presentation\Controllers\Auth\RegisterController;
-use App\Presentation\Controllers\HomeController;
 use App\Presentation\Controllers\EcommerceController;
 use Illuminate\Support\Facades\Route;
 
@@ -51,7 +50,7 @@ Route::middleware([
     Route::get('medicines/inventory/report', [MedicineController::class, 'inventoryReport'])->name('medicines.inventory-report');
 
     // Transaction Routes
-    Route::resource('transactions', TransactionController::class);
+    Route::resource('transactions', SellTransactionController::class);
 
     // Buy Transaction Routes
     Route::resource('buy-transactions', BuyTransactionController::class);

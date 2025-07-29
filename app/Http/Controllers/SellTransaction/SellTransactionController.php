@@ -5,10 +5,8 @@ namespace App\Presentation\Controllers\Web;
 use App\Presentation\Controllers\BaseController;
 use Illuminate\Http\Request;
 
-class TransactionController extends BaseController
-{
-    public function index()
-    {
+class SellTransactionController extends BaseController {
+    public function index() {
         // Dummy data for transactions
         $transactions = [
             [
@@ -94,8 +92,7 @@ class TransactionController extends BaseController
         return view('features.transactions.index', compact('transactions'));
     }
 
-    public function create()
-    {
+    public function create() {
         // Dummy medicines for dropdown
         $medicines = [
             ['id' => 1, 'name' => 'Paracetamol 500mg', 'stock' => 150, 'price' => 20000],
@@ -109,8 +106,7 @@ class TransactionController extends BaseController
         return view('features.transactions.create', compact('medicines'));
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         // Validate the request
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -126,8 +122,7 @@ class TransactionController extends BaseController
             ->with('success', 'Transaction created successfully!');
     }
 
-    public function show($id)
-    {
+    public function show($id) {
         // Dummy transaction data
         $transaction = [
             'id' => $id,
@@ -148,8 +143,7 @@ class TransactionController extends BaseController
         return view('features.transactions.show', compact('transaction'));
     }
 
-    public function edit($id)
-    {
+    public function edit($id) {
         // Dummy transaction data for editing
         $transaction = [
             'id' => $id,
@@ -170,8 +164,7 @@ class TransactionController extends BaseController
         return view('features.transactions.edit', compact('transaction', 'medicines'));
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         // Validate the request
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -187,10 +180,9 @@ class TransactionController extends BaseController
             ->with('success', 'Transaction updated successfully!');
     }
 
-    public function destroy($id)
-    {
+    public function destroy($id) {
         // In a real application, you would delete from database here
         return redirect()->route('transactions.index')
             ->with('success', 'Transaction deleted successfully!');
     }
-} 
+}

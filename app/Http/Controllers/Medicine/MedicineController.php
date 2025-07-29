@@ -8,36 +8,33 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 
-class MedicineController extends BaseController
-{
+class MedicineController extends BaseController {
     public function __construct(
         private MedicineApplicationService $medicineService
-    ) {}
+    ) {
+    }
 
     /**
      * Display a listing of medicines
      */
-    public function index(): View
-    {
+    public function index(): View {
         $medicines = $this->medicineService->getAllMedicines();
         $statistics = $this->medicineService->getMedicineStatistics();
-        
+
         return view('features.medicines.index', compact('medicines', 'statistics'));
     }
 
     /**
      * Show the form for creating a new medicine
      */
-    public function create(): View
-    {
+    public function create(): View {
         return view('features.medicines.create');
     }
 
     /**
      * Store a newly created medicine
      */
-    public function store(Request $request): RedirectResponse
-    {
+    public function store(Request $request): RedirectResponse {
         try {
             $validated = $request->validate([
                 'medicine_name' => 'required|string|min:2|max:255',
@@ -53,12 +50,10 @@ class MedicineController extends BaseController
 
             return redirect()->route('medicines.index')
                 ->with('success', 'Obat berhasil ditambahkan');
-
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => $e->getMessage()]);
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
@@ -69,10 +64,9 @@ class MedicineController extends BaseController
     /**
      * Display the specified medicine
      */
-    public function show(int $id): View
-    {
+    public function show(int $id): View {
         $medicine = $this->medicineService->getMedicine($id);
-        
+
         if (!$medicine) {
             abort(404, 'Obat tidak ditemukan');
         }
@@ -83,10 +77,9 @@ class MedicineController extends BaseController
     /**
      * Show the form for editing the specified medicine
      */
-    public function edit(int $id): View
-    {
+    public function edit(int $id): View {
         $medicine = $this->medicineService->getMedicine($id);
-        
+
         if (!$medicine) {
             abort(404, 'Obat tidak ditemukan');
         }
@@ -97,8 +90,7 @@ class MedicineController extends BaseController
     /**
      * Update the specified medicine
      */
-    public function update(Request $request, int $id): RedirectResponse
-    {
+    public function update(Request $request, int $id): RedirectResponse {
         try {
             $validated = $request->validate([
                 'medicine_name' => 'required|string|min:2|max:255',
@@ -114,12 +106,10 @@ class MedicineController extends BaseController
 
             return redirect()->route('medicines.index')
                 ->with('success', 'Obat berhasil diperbarui');
-
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()
                 ->withInput()
                 ->withErrors(['error' => $e->getMessage()]);
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withInput()
@@ -130,8 +120,7 @@ class MedicineController extends BaseController
     /**
      * Remove the specified medicine
      */
-    public function destroy(int $id): RedirectResponse
-    {
+    public function destroy(int $id): RedirectResponse {
         try {
             $deleted = $this->medicineService->deleteMedicine($id);
 
@@ -142,11 +131,9 @@ class MedicineController extends BaseController
 
             return redirect()->route('medicines.index')
                 ->with('success', 'Obat berhasil dihapus');
-
         } catch (\InvalidArgumentException $e) {
             return redirect()->back()
                 ->withErrors(['error' => $e->getMessage()]);
-
         } catch (\Exception $e) {
             return redirect()->back()
                 ->withErrors(['error' => 'Terjadi kesalahan saat menghapus obat']);
@@ -156,8 +143,7 @@ class MedicineController extends BaseController
     /**
      * Display medicines with low stock
      */
-    public function lowStock(): View
-    {
+    public function lowStock(): View {
         $medicines = $this->medicineService->getLowStockMedicines();
         return view('features.medicines.low-stock', compact('medicines'));
     }
@@ -165,8 +151,7 @@ class MedicineController extends BaseController
     /**
      * Display medicines that are out of stock
      */
-    public function outOfStock(): View
-    {
+    public function outOfStock(): View {
         $medicines = $this->medicineService->getOutOfStockMedicines();
         return view('features.medicines.out-of-stock', compact('medicines'));
     }
@@ -174,8 +159,7 @@ class MedicineController extends BaseController
     /**
      * Display inventory report
      */
-    public function inventoryReport(): View
-    {
+    public function inventoryReport(): View {
         $report = $this->medicineService->getInventoryReport();
         return view('features.medicines.inventory-report', compact('report'));
     }
@@ -183,13 +167,13 @@ class MedicineController extends BaseController
     /**
      * Search medicines
      */
-    public function search(Request $request): View
-    {
+    public function search(Request $request): View {
         $query = $request->get('q', '');
-        
+
         if (empty($query)) {
-            return redirect()->route('medicines.index')
-                ->withErrors(['error' => 'Kata kunci pencarian diperlukan']);
+            $medicines = $this->medicineService->getAllMedicines();
+            $statistics = $this->medicineService->getMedicineStatistics();
+            return view('features.medicines.index', compact('medicines', 'statistics'));
         }
 
         $medicines = $this->medicineService->searchMedicines($query);
@@ -199,8 +183,7 @@ class MedicineController extends BaseController
     /**
      * Display expired medicines
      */
-    public function expired(): View
-    {
+    public function expired(): View {
         $medicines = $this->medicineService->getExpiredMedicines();
         return view('features.medicines.expired', compact('medicines'));
     }
@@ -208,9 +191,8 @@ class MedicineController extends BaseController
     /**
      * Display medicines expiring soon
      */
-    public function expiringSoon(): View
-    {
+    public function expiringSoon(): View {
         $medicines = $this->medicineService->getExpiringSoonMedicines();
         return view('features.medicines.expiring-soon', compact('medicines'));
     }
-} 
+}
