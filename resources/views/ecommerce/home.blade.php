@@ -14,42 +14,32 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css">
     
     <style>
-        :root {
-            --primary-color: #00BFA6;
-            --secondary-color: #FF6B35;
-            --accent-color: #FFD93D;
-            --text-dark: #2C3E50;
-            --text-light: #7F8C8D;
-            --bg-light: #F8F9FA;
-            --white: #FFFFFF;
-            --shadow: 0 2px 10px rgba(0,0,0,0.1);
-            --shadow-hover: 0 5px 20px rgba(0,0,0,0.15);
-        }
+        /* Using global color system from app.css */
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--text-dark);
+            color: var(--text-primary);
         }
 
         /* Header Styles */
         .top-header {
-            background: var(--primary-color);
-            color: white;
+            background: var(--primary-500);
+            color: var(--text-inverse);
             padding: 8px 0;
             font-size: 14px;
         }
 
         .main-header {
-            background: white;
-            box-shadow: var(--shadow);
+            background: var(--bg-primary);
+            box-shadow: var(--shadow-md);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
         .search-bar {
-            background: var(--bg-light);
-            border: 2px solid var(--primary-color);
+            background: var(--bg-secondary);
+            border: 2px solid var(--primary-500);
             border-radius: 25px;
             padding: 12px 20px;
             width: 100%;
@@ -63,8 +53,8 @@
 
         /* Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #00A896 100%);
-            color: white;
+            background: var(--bg-gradient-primary);
+            color: var(--text-inverse);
             padding: 60px 0;
             position: relative;
             overflow: hidden;
@@ -82,52 +72,52 @@
 
         /* Category Cards */
         .category-card {
-            background: white;
+            background: var(--bg-primary);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
             border: 2px solid transparent;
         }
 
         .category-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
-            border-color: var(--primary-color);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-500);
         }
 
         .category-icon {
             width: 60px;
             height: 60px;
-            background: linear-gradient(135deg, var(--primary-color), #00A896);
+            background: var(--bg-gradient-primary);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 15px;
-            color: white;
+            color: var(--text-inverse);
             font-size: 24px;
         }
 
         /* Product Cards */
         .product-card {
-            background: white;
+            background: var(--bg-primary);
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-            border: 1px solid #E9ECEF;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition-normal);
+            border: 1px solid var(--border-light);
         }
 
         .product-card:hover {
             transform: translateY(-5px);
-            box-shadow: var(--shadow-hover);
+            box-shadow: var(--shadow-lg);
         }
 
         .product-image {
             height: 200px;
-            background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+            background: linear-gradient(45deg, var(--bg-secondary), var(--border-light));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -145,8 +135,8 @@
             position: absolute;
             top: 10px;
             left: 10px;
-            background: var(--secondary-color);
-            color: white;
+            background: var(--secondary-500);
+            color: var(--text-inverse);
             padding: 4px 8px;
             border-radius: 12px;
             font-size: 12px;
@@ -160,7 +150,7 @@
         .product-title {
             font-weight: 600;
             margin-bottom: 8px;
-            color: var(--text-dark);
+            color: var(--text-primary);
             font-size: 14px;
             line-height: 1.4;
         }
@@ -168,37 +158,37 @@
         .product-price {
             font-size: 18px;
             font-weight: bold;
-            color: var(--primary-color);
+            color: var(--primary-500);
             margin-bottom: 10px;
         }
 
         .product-rating {
-            color: var(--accent-color);
+            color: var(--accent-500);
             font-size: 14px;
             margin-bottom: 10px;
         }
 
         .btn-add-cart {
-            background: var(--primary-color);
-            color: white;
+            background: var(--primary-500);
+            color: var(--text-inverse);
             border: none;
             border-radius: 25px;
             padding: 8px 20px;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
             width: 100%;
         }
 
         .btn-add-cart:hover {
-            background: #00A896;
-            color: white;
+            background: var(--primary-600);
+            color: var(--text-inverse);
             transform: scale(1.05);
         }
 
         /* Banner Section */
         .banner-section {
-            background: linear-gradient(135deg, var(--secondary-color), #FF8A65);
-            color: white;
+            background: var(--bg-gradient-secondary);
+            color: var(--text-inverse);
             border-radius: 20px;
             padding: 30px;
             margin: 30px 0;
@@ -213,36 +203,36 @@
         .feature-icon {
             width: 50px;
             height: 50px;
-            background: var(--primary-color);
+            background: var(--primary-500);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 15px;
-            color: white;
+            color: var(--text-inverse);
             font-size: 20px;
         }
 
         /* Footer */
         .footer {
-            background: var(--text-dark);
-            color: white;
+            background: var(--neutral-900);
+            color: var(--text-inverse);
             padding: 40px 0 20px;
         }
 
         .footer h5 {
-            color: var(--primary-color);
+            color: var(--primary-500);
             margin-bottom: 20px;
         }
 
         .footer a {
-            color: #BDC3C7;
+            color: var(--neutral-400);
             text-decoration: none;
-            transition: color 0.3s ease;
+            transition: var(--transition-normal);
         }
 
         .footer a:hover {
-            color: var(--primary-color);
+            color: var(--primary-500);
         }
 
         /* Responsive */

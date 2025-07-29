@@ -6,20 +6,19 @@ use App\Application\Services\AuthApplicationService;
 use App\Presentation\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
 
-class LoginController extends BaseController
-{
+class LoginController extends BaseController {
     public function __construct(
         private AuthApplicationService $authApplicationService
-    ) {}
+    ) {
+    }
 
-    public function showLoginForm()
-    {
+    public function showLoginForm() {
         return view('pages.auth.login');
     }
 
-    public function login(Request $request)
-    {
+    public function login(Request $request) {
         $request->validate([
             'login' => 'required|string', // Can be email or username
             'password' => 'required',
@@ -33,15 +32,14 @@ class LoginController extends BaseController
         $user = $this->authApplicationService->loginAndGetUser($login, $password);
 
         if ($user) {
+            // User is already logged in by AuthService, just set remember if needed
             if ($remember) {
-                auth()->login($user, true);
-            } else {
-                auth()->login($user);
+                Auth::login($user, true);
             }
 
             $request->session()->regenerate();
 
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(default: route(name: 'dashboard'));
         }
 
         throw ValidationException::withMessages([
@@ -49,8 +47,7 @@ class LoginController extends BaseController
         ]);
     }
 
-    public function logout(Request $request)
-    {
+    public function logout(Request $request) {
         $this->authApplicationService->logout();
 
         $request->session()->invalidate();

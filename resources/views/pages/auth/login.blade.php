@@ -427,16 +427,18 @@
                 </div>
             @endif
 
-            <form wire:submit.prevent="login">
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
                 <div class="form-group">
-                    <label for="email" class="form-label">Email Address</label>
+                    <label for="login" class="form-label">Email atau Username</label>
                     <div class="input-group">
                         <i class="fas fa-envelope input-icon"></i>
-                        <input wire:model="email" id="email" name="email" type="email" required 
+                        <input id="login" name="login" type="text" required 
                                class="form-control input-with-icon" 
-                               placeholder="Masukkan email Anda">
+                               placeholder="Masukkan email atau username Anda"
+                               value="{{ old('login') }}">
                     </div>
-                    @error('email') 
+                    @error('login') 
                         <small class="text-danger">{{ $message }}</small> 
                     @enderror
                 </div>
@@ -445,7 +447,7 @@
                     <label for="password" class="form-label">Password</label>
                     <div class="input-group">
                         <i class="fas fa-lock input-icon"></i>
-                        <input wire:model="password" id="password" name="password" type="password" required 
+                        <input id="password" name="password" type="password" required 
                                class="form-control input-with-icon" 
                                placeholder="Masukkan password Anda">
                     </div>
@@ -456,7 +458,7 @@
 
                 <div class="checkbox-group">
                     <div class="checkbox-wrapper">
-                        <input wire:model="remember" id="remember" name="remember" type="checkbox" class="form-check-input">
+                        <input id="remember" name="remember" type="checkbox" class="form-check-input" value="1">
                         <label for="remember" class="form-check-label">Ingat saya</label>
                     </div>
                     <a href="#" class="forgot-password">Lupa password?</a>

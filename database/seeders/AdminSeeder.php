@@ -15,6 +15,7 @@ class AdminSeeder extends Seeder
     {
         // Create Admin User
         User::create([
+            'username' => 'admin',
             'name' => 'Administrator',
             'email' => 'admin@apotek.com',
             'password' => Hash::make('admin123'),
@@ -27,10 +28,11 @@ class AdminSeeder extends Seeder
 
         // Create Apoteker User
         User::create([
+            'username' => 'apoteker',
             'name' => 'Apoteker',
             'email' => 'apoteker@apotek.com',
             'password' => Hash::make('apoteker123'),
-            'role' => 'apoteker',
+            'role' => 'pharmacist',
             'phone' => '08123456788',
             'address' => 'Jl. Apoteker No. 1, Jakarta',
             'is_active' => true,
@@ -39,10 +41,11 @@ class AdminSeeder extends Seeder
 
         // Create Sample Pelanggan
         User::create([
+            'username' => 'pelanggan',
             'name' => 'Pelanggan Sample',
             'email' => 'pelanggan@apotek.com',
             'password' => Hash::make('pelanggan123'),
-            'role' => 'users_pelanggan',
+            'role' => 'buyer',
             'phone' => '08123456787',
             'address' => 'Jl. Pelanggan No. 1, Jakarta',
             'is_active' => true,

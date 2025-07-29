@@ -36,7 +36,7 @@ Route::middleware([
     'admin'
 ])->group(function () {
     Route::get('/dashboard', function () {
-        return view('features.dashboard.dashboard');
+        return view('pages.dashboard.index');
     })->name('dashboard');
 
     // Medicine Routes
