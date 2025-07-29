@@ -1,6 +1,8 @@
 <?php
 
 use App\Presentation\Controllers\Web\MedicineController;
+use App\Presentation\Controllers\Web\TransactionController;
+use App\Presentation\Controllers\Web\BuyTransactionController;
 use App\Presentation\Controllers\Auth\LoginController;
 use App\Presentation\Controllers\Auth\RegisterController;
 use App\Presentation\Controllers\HomeController;
@@ -40,6 +42,12 @@ Route::middleware([
     Route::get('medicines/expired', [MedicineController::class, 'expired'])->name('medicines.expired');
     Route::get('medicines/expiring-soon', [MedicineController::class, 'expiringSoon'])->name('medicines.expiring-soon');
     Route::get('medicines/inventory/report', [MedicineController::class, 'inventoryReport'])->name('medicines.inventory-report');
+
+    // Transaction Routes
+    Route::resource('transactions', TransactionController::class);
+
+    // Buy Transaction Routes
+    Route::resource('buy-transactions', BuyTransactionController::class);
 });
 
 require __DIR__.'/auth.php';
