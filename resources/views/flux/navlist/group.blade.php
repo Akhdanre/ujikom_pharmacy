@@ -22,7 +22,7 @@
         <div class="absolute inset-y-[3px] start-0 ms-4 w-px bg-zinc-200 dark:bg-white/30"></div>
 
         {{ $slot }}
-    </div>
+    </div>s
 </ui-disclosure>
 
 <?php elseif ($heading): ?>

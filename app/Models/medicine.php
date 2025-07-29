@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Domain\Medicine\Entities\Medicine as MedicineEntity;
 
-class medicine extends Model
+/**
+ * Medicine Model - Alias untuk Medicine Entity
+ */
+class medicine extends MedicineEntity
 {
-    //
+    // Tidak perlu mendefinisikan relasi lagi karena sudah ada di Entity
 }
