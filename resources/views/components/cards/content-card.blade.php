@@ -5,4 +5,4 @@
         <h2 class="h4 fw-bold mb-4" style="color: var(--color-text-primary);">{{ $title }}</h2>
     @endif
     {{ $slot }}
-</div>
+</div> 

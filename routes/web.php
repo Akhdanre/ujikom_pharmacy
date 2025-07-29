@@ -6,18 +6,25 @@ use App\Presentation\Controllers\Web\BuyTransactionController;
 use App\Presentation\Controllers\Auth\LoginController;
 use App\Presentation\Controllers\Auth\RegisterController;
 use App\Presentation\Controllers\HomeController;
+use App\Presentation\Controllers\EcommerceController;
 use Illuminate\Support\Facades\Route;
 
-// Public Routes
-Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/medicine/{id}', [HomeController::class, 'show'])->name('medicine.detail');
-Route::get('/category/{category}', [HomeController::class, 'category'])->name('category');
+// Public E-commerce Routes (Tokopedia/Shopee Style)
+Route::get('/', [EcommerceController::class, 'index'])->name('home');
+Route::get('/products', [EcommerceController::class, 'products'])->name('products');
+Route::get('/product/{id}', [EcommerceController::class, 'productDetail'])->name('product.detail');
+Route::get('/category/{category}', [EcommerceController::class, 'category'])->name('category');
+Route::get('/search', [EcommerceController::class, 'search'])->name('search');
+Route::get('/cart', [EcommerceController::class, 'cart'])->name('cart');
+Route::get('/checkout', [EcommerceController::class, 'checkout'])->name('checkout');
+Route::get('/about', [EcommerceController::class, 'about'])->name('about');
+Route::get('/contact', [EcommerceController::class, 'contact'])->name('contact');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [LoginController::class, 'login']);
-    
+
     Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
     Route::post('/register', [RegisterController::class, 'register']);
 });
@@ -26,7 +33,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->midd
 
 Route::middleware([
     'auth',
-    'admin',
+    'admin'
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('features.dashboard.dashboard');
@@ -34,7 +41,7 @@ Route::middleware([
 
     // Medicine Routes
     Route::resource('medicines', MedicineController::class);
-    
+
     // Additional Medicine Routes
     Route::get('medicines/search', [MedicineController::class, 'search'])->name('medicines.search');
     Route::get('medicines/low-stock', [MedicineController::class, 'lowStock'])->name('medicines.low-stock');
@@ -50,4 +57,4 @@ Route::middleware([
     Route::resource('buy-transactions', BuyTransactionController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
