@@ -109,7 +109,7 @@ class BuyTransactionController extends BaseController
             ]
         ];
 
-        return view('buy-transactions.index', compact('buyTransactions'));
+        return view('features.buy-transactions.index', compact('buyTransactions'));
     }
 
     public function create()
@@ -134,7 +134,7 @@ class BuyTransactionController extends BaseController
             ['id' => 6, 'name' => 'Cetirizine 10mg', 'current_stock' => 90, 'suggested_price' => 10000],
         ];
 
-        return view('buy-transactions.create', compact('suppliers', 'medicines'));
+        return view('features.buy-transactions.create', compact('suppliers', 'medicines'));
     }
 
     public function store(Request $request)
@@ -178,7 +178,7 @@ class BuyTransactionController extends BaseController
             'invoice_number' => 'INV-2024-001'
         ];
 
-        return view('buy-transactions.show', compact('buyTransaction'));
+        return view('features.buy-transactions.show', compact('buyTransaction'));
     }
 
     public function edit($id)
@@ -208,7 +208,7 @@ class BuyTransactionController extends BaseController
             ['id' => 3, 'name' => 'Ibuprofen 400mg', 'current_stock' => 120, 'suggested_price' => 16000],
         ];
 
-        return view('buy-transactions.edit', compact('buyTransaction', 'suppliers', 'medicines'));
+        return view('features.buy-transactions.edit', compact('buyTransaction', 'suppliers', 'medicines'));
     }
 
     public function update(Request $request, $id)

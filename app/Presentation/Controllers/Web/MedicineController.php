@@ -22,7 +22,7 @@ class MedicineController extends BaseController
         $medicines = $this->medicineService->getAllMedicines();
         $statistics = $this->medicineService->getMedicineStatistics();
         
-        return view('medicines.index', compact('medicines', 'statistics'));
+        return view('features.medicines.index', compact('medicines', 'statistics'));
     }
 
     /**
@@ -30,7 +30,7 @@ class MedicineController extends BaseController
      */
     public function create(): View
     {
-        return view('medicines.create');
+        return view('features.medicines.create');
     }
 
     /**
@@ -77,7 +77,7 @@ class MedicineController extends BaseController
             abort(404, 'Obat tidak ditemukan');
         }
 
-        return view('medicines.show', compact('medicine'));
+        return view('features.medicines.show', compact('medicine'));
     }
 
     /**
@@ -91,7 +91,7 @@ class MedicineController extends BaseController
             abort(404, 'Obat tidak ditemukan');
         }
 
-        return view('medicines.edit', compact('medicine'));
+        return view('features.medicines.edit', compact('medicine'));
     }
 
     /**
@@ -159,7 +159,7 @@ class MedicineController extends BaseController
     public function lowStock(): View
     {
         $medicines = $this->medicineService->getLowStockMedicines();
-        return view('medicines.low-stock', compact('medicines'));
+        return view('features.medicines.low-stock', compact('medicines'));
     }
 
     /**
@@ -168,7 +168,7 @@ class MedicineController extends BaseController
     public function outOfStock(): View
     {
         $medicines = $this->medicineService->getOutOfStockMedicines();
-        return view('medicines.out-of-stock', compact('medicines'));
+        return view('features.medicines.out-of-stock', compact('medicines'));
     }
 
     /**
@@ -177,7 +177,7 @@ class MedicineController extends BaseController
     public function inventoryReport(): View
     {
         $report = $this->medicineService->getInventoryReport();
-        return view('medicines.inventory-report', compact('report'));
+        return view('features.medicines.inventory-report', compact('report'));
     }
 
     /**
@@ -193,7 +193,7 @@ class MedicineController extends BaseController
         }
 
         $medicines = $this->medicineService->searchMedicines($query);
-        return view('medicines.search', compact('medicines', 'query'));
+        return view('features.medicines.search', compact('medicines', 'query'));
     }
 
     /**
@@ -202,7 +202,7 @@ class MedicineController extends BaseController
     public function expired(): View
     {
         $medicines = $this->medicineService->getExpiredMedicines();
-        return view('medicines.expired', compact('medicines'));
+        return view('features.medicines.expired', compact('medicines'));
     }
 
     /**
@@ -211,6 +211,6 @@ class MedicineController extends BaseController
     public function expiringSoon(): View
     {
         $medicines = $this->medicineService->getExpiringSoonMedicines();
-        return view('medicines.expiring-soon', compact('medicines'));
+        return view('features.medicines.expiring-soon', compact('medicines'));
     }
 } 

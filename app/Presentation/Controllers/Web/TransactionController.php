@@ -91,7 +91,7 @@ class TransactionController extends BaseController
             ]
         ];
 
-        return view('transactions.index', compact('transactions'));
+        return view('features.transactions.index', compact('transactions'));
     }
 
     public function create()
@@ -106,7 +106,7 @@ class TransactionController extends BaseController
             ['id' => 6, 'name' => 'Cetirizine 10mg', 'stock' => 90, 'price' => 15000],
         ];
 
-        return view('transactions.create', compact('medicines'));
+        return view('features.transactions.create', compact('medicines'));
     }
 
     public function store(Request $request)
@@ -145,7 +145,7 @@ class TransactionController extends BaseController
             'notes' => 'Customer requested for headache relief'
         ];
 
-        return view('transactions.show', compact('transaction'));
+        return view('features.transactions.show', compact('transaction'));
     }
 
     public function edit($id)
@@ -167,7 +167,7 @@ class TransactionController extends BaseController
             ['id' => 3, 'name' => 'Ibuprofen 400mg', 'stock' => 120, 'price' => 25000],
         ];
 
-        return view('transactions.edit', compact('transaction', 'medicines'));
+        return view('features.transactions.edit', compact('transaction', 'medicines'));
     }
 
     public function update(Request $request, $id)

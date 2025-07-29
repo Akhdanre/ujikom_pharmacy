@@ -10,4 +10,4 @@
     @endif
     <h2 class="display-6 fw-bold" style="color: var(--color-text-primary);">{{ $value }}</h2>
     <p class="text-muted mb-0">{{ $title }}</p>
-</div>
+</div> 

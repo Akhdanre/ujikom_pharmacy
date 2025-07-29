@@ -3,7 +3,7 @@
 @section('content')
 <div class="container-fluid">
     <!-- Header -->
-    <x-layout.page-header 
+    <x-shared.components.layout.page-header 
         title="Transactions"
         subtitle="Manage all pharmacy transactions"
         :action="route('transactions.create')"
@@ -19,7 +19,7 @@
     @endif
 
     <!-- Filters and Search -->
-    <x-filters.filter-panel>
+    <x-shared.components.filters.filter-panel>
         <div class="col-md-3">
             <label for="status-filter" class="form-label">Status</label>
             <select class="form-select" id="status-filter">
@@ -48,34 +48,34 @@
         </div>
         
         <x-slot name="search">
-            <x-filters.search-filter 
+            <x-shared.components.filters.search-filter 
                 placeholder="Search by customer name, medicine, or phone..." 
                 id="search-input" />
         </x-slot>
-    </x-filters.filter-panel>
+    </x-shared.components.filters.filter-panel>
 
     <!-- Statistics Cards -->
     <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <x-cards.stat-card 
+            <x-shared.components.cards.stat-card 
                 title="Total Transactions"
                 :value="count($transactions)"
                 color="success" />
         </div>
         <div class="col-md-3">
-            <x-cards.stat-card 
+            <x-shared.components.cards.stat-card 
                 title="Completed"
                 :value="count(array_filter($transactions, fn($t) => $t['status'] === 'completed'))"
                 color="success" />
         </div>
         <div class="col-md-3">
-            <x-cards.stat-card 
+            <x-shared.components.cards.stat-card 
                 title="Pending"
                 :value="count(array_filter($transactions, fn($t) => $t['status'] === 'pending'))"
                 color="warning" />
         </div>
         <div class="col-md-3">
-            <x-cards.stat-card 
+            <x-shared.components.cards.stat-card 
                 title="Cancelled"
                 :value="count(array_filter($transactions, fn($t) => $t['status'] === 'cancelled'))"
                 color="error" />
@@ -83,45 +83,16 @@
     </div>
 
     <!-- Transactions Table -->
-    <x-cards.content-card>
-        <x-tables.data-table 
+    <x-shared.components.cards.content-card>
+        <x-shared.components.tables.data-table 
             :headers="['ID', 'Date', 'Customer', 'Medicine', 'Qty', 'Total', 'Status', 'Payment', 'Cashier', 'Actions']"
             :rows="$transactions"
             id="transactions-table">
             
             @foreach($transactions as $transaction)
-            <tr>
-                <td style="color: var(--color-text-primary);">#{{ $transaction['id'] }}</td>
-                <td style="color: var(--color-text-primary);">{{ $transaction['date'] }}</td>
-                <td>
-                    <div>
-                        <div style="color: var(--color-text-primary); font-weight: 500;">{{ $transaction['customer_name'] }}</div>
-                        <small style="color: var(--color-text-secondary);">{{ $transaction['customer_phone'] }}</small>
-                    </div>
-                </td>
-                <td style="color: var(--color-text-primary);">{{ $transaction['medicine_name'] }}</td>
-                <td style="color: var(--color-text-primary);">{{ $transaction['quantity'] }}</td>
-                <td style="color: var(--color-text-primary); font-weight: 500;">Rp {{ number_format($transaction['total_price'], 0, ',', '.') }}</td>
-                <td>
-                    @if($transaction['status'] === 'completed')
-                        <span class="badge-custom badge-success">{{ ucfirst($transaction['status']) }}</span>
-                    @elseif($transaction['status'] === 'pending')
-                        <span class="badge-custom badge-warning">{{ ucfirst($transaction['status']) }}</span>
-                    @else
-                        <span class="badge-custom badge-error">{{ ucfirst($transaction['status']) }}</span>
-                    @endif
-                </td>
-                <td style="color: var(--color-text-primary);">{{ $transaction['payment_method'] }}</td>
-                <td style="color: var(--color-text-primary);">{{ $transaction['cashier'] }}</td>
-                <td>
-                    <x-tables.action-buttons 
-                        :viewUrl="route('transactions.show', $transaction['id'])"
-                        :editUrl="route('transactions.edit', $transaction['id'])"
-                        :deleteId="$transaction['id']" />
-                </td>
-            </tr>
+                <x-shared.components.features.transaction-row :transaction="$transaction" type="sale" />
             @endforeach
-        </x-tables.data-table>
+        </x-shared.components.tables.data-table>
 
         <!-- Pagination -->
         <div class="d-flex justify-content-between align-items-center mt-4">
@@ -140,11 +111,11 @@
                 </ul>
             </nav>
         </div>
-    </x-cards.content-card>
+    </x-shared.components.cards.content-card>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<x-modals.delete-modal 
+<x-shared.components.modals.delete-modal 
     message="Are you sure you want to delete this transaction? This action cannot be undone." />
 
 <script>

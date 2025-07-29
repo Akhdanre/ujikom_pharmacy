@@ -15,4 +15,4 @@
             {{ $actionText }}
         </a>
     @endif
-</div>
+</div> 

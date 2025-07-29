@@ -16,4 +16,4 @@
     <div style="position: relative; height: {{ $height }};">
         <canvas id="{{ $id }}"></canvas>
     </div>
-</div>
+</div> 

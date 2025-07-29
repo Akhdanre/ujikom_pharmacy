@@ -1,6 +1,9 @@
 /* Import Bootstrap CSS */
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
+/* Import Component Styles */
+@import './components.css';
+
 /* Global Color Palette Variables */
 :root {
     /* Primary Colors */
