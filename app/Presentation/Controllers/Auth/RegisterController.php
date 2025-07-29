@@ -15,7 +15,7 @@ class RegisterController extends BaseController
 
     public function showRegistrationForm()
     {
-        return view('auth.register');
+        return view('pages.auth.register');
     }
 
     public function register(Request $request)

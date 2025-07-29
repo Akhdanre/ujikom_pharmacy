@@ -15,7 +15,7 @@ class LoginController extends BaseController
 
     public function showLoginForm()
     {
-        return view('auth.login');
+        return view('pages.auth.login');
     }
 
     public function login(Request $request)
@@ -58,4 +58,4 @@ class LoginController extends BaseController
 
         return redirect('/');
     }
-} 
+}

@@ -191,6 +191,129 @@ class MedicineApplicationService
         return $medicine ? $this->entityToDTO($medicine) : null;
     }
 
+    // New E-commerce Methods
+    public function getFeaturedMedicines(int $limit = 8): array
+    {
+        // Get medicines with high stock and good ratings (simulated)
+        $medicines = $this->medicineService->getActiveMedicines()->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getPopularMedicines(int $limit = 8): array
+    {
+        // Get medicines with high sales (simulated)
+        $medicines = $this->medicineService->getActiveMedicines()->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesWithFilters(array $filters): array
+    {
+        $medicines = $this->medicineService->getActiveMedicines();
+        
+        // Apply search filter
+        if (!empty($filters['search'])) {
+            $medicines = $medicines->filter(function($medicine) use ($filters) {
+                return stripos($medicine->name, $filters['search']) !== false ||
+                       stripos($medicine->description, $filters['search']) !== false;
+            });
+        }
+        
+        // Apply category filter
+        if (!empty($filters['category'])) {
+            $medicines = $medicines->where('category_id', $filters['category']);
+        }
+        
+        // Apply price range filter
+        if (!empty($filters['min_price'])) {
+            $medicines = $medicines->where('price', '>=', $filters['min_price']);
+        }
+        
+        if (!empty($filters['max_price'])) {
+            $medicines = $medicines->where('price', '<=', $filters['max_price']);
+        }
+        
+        // Apply sorting
+        if (!empty($filters['sort'])) {
+            $order = $filters['order'] ?? 'asc';
+            $medicines = $medicines->sortBy($filters['sort']);
+            if ($order === 'desc') {
+                $medicines = $medicines->reverse();
+            }
+        }
+        
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getNewArrivals(int $limit = 8): array
+    {
+        // Get recently added medicines
+        $medicines = $this->medicineService->getActiveMedicines()
+            ->sortByDesc('created_at')
+            ->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getDiscountedMedicines(int $limit = 8): array
+    {
+        // Get medicines with discounts (simulated)
+        $medicines = $this->medicineService->getActiveMedicines()->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByBrand(string $brand, int $limit = 12): array
+    {
+        $medicines = $this->medicineService->getActiveMedicines()
+            ->filter(function($medicine) use ($brand) {
+                return stripos($medicine->manufacturer, $brand) !== false;
+            })
+            ->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByUsage(string $usage, int $limit = 12): array
+    {
+        $medicines = $this->medicineService->getActiveMedicines()
+            ->filter(function($medicine) use ($usage) {
+                return stripos($medicine->description, $usage) !== false;
+            })
+            ->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesInStock(int $limit = 12): array
+    {
+        $medicines = $this->medicineService->getActiveMedicines()
+            ->where('stock', '>', 0)
+            ->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByRating(float $minRating = 4.0, int $limit = 12): array
+    {
+        // Simulated rating filter
+        $medicines = $this->medicineService->getActiveMedicines()->take($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByAvailability(string $availability = 'in_stock', int $limit = 12): array
+    {
+        switch ($availability) {
+            case 'in_stock':
+                $medicines = $this->medicineService->getActiveMedicines()->where('stock', '>', 0);
+                break;
+            case 'low_stock':
+                $medicines = $this->medicineService->getLowStockMedicines();
+                break;
+            case 'out_of_stock':
+                $medicines = $this->medicineService->getOutOfStockMedicines();
+                break;
+            default:
+                $medicines = $this->medicineService->getActiveMedicines();
+        }
+        
+        return $medicines->take($limit)->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
     private function entityToDTO($medicine): MedicineDTO
     {
         return MedicineDTO::fromArray($medicine->toArray());
