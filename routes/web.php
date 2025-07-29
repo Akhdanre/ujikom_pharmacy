@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\MedicineController;
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
+use App\Presentation\Controllers\Web\MedicineController;
+use App\Presentation\Controllers\Auth\LoginController;
+use App\Presentation\Controllers\Auth\RegisterController;
 use App\Presentation\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,9 +23,7 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified',
+    'auth',
     'admin',
 ])->group(function () {
     Route::get('/dashboard', function () {
@@ -34,6 +32,14 @@ Route::middleware([
 
     // Medicine Routes
     Route::resource('medicines', MedicineController::class);
+    
+    // Additional Medicine Routes
+    Route::get('medicines/search', [MedicineController::class, 'search'])->name('medicines.search');
+    Route::get('medicines/low-stock', [MedicineController::class, 'lowStock'])->name('medicines.low-stock');
+    Route::get('medicines/out-of-stock', [MedicineController::class, 'outOfStock'])->name('medicines.out-of-stock');
+    Route::get('medicines/expired', [MedicineController::class, 'expired'])->name('medicines.expired');
+    Route::get('medicines/expiring-soon', [MedicineController::class, 'expiringSoon'])->name('medicines.expiring-soon');
+    Route::get('medicines/inventory/report', [MedicineController::class, 'inventoryReport'])->name('medicines.inventory-report');
 });
 
 require __DIR__.'/auth.php';

@@ -31,11 +31,11 @@ interface SalesTransactionRepositoryInterface
     
     public function getByTotalPriceRange(float $minPrice, float $maxPrice): Collection;
     
-    public function getTotalSalesAmount(string $startDate = null, string $endDate = null): float;
+    public function getTotalSalesAmount(?string $startDate = null, ?string $endDate = null): float;
     
-    public function getSalesCount(string $startDate = null, string $endDate = null): int;
+    public function getSalesCount(?string $startDate = null, ?string $endDate = null): int;
     
-    public function getAverageSalesAmount(string $startDate = null, string $endDate = null): float;
+    public function getAverageSalesAmount(?string $startDate = null, ?string $endDate = null): float;
     
     public function getTopSellers(int $limit = 10): Collection;
     

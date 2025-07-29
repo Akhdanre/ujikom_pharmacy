@@ -21,11 +21,34 @@
                     @enderror
                 </div>
                 <div>
+                    <label for="username" class="sr-only">Username</label>
+                    <input id="username" name="username" type="text" 
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('username') border-red-500 @enderror" 
+                           placeholder="Username (opsional)" value="{{ old('username') }}">
+                    @error('username')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
                     <label for="email" class="sr-only">Email</label>
                     <input id="email" name="email" type="email" required 
                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('email') border-red-500 @enderror" 
                            placeholder="Email" value="{{ old('email') }}">
                     @error('email')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="role" class="sr-only">Role</label>
+                    <select id="role" name="role" 
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm @error('role') border-red-500 @enderror">
+                        <option value="">Pilih Role</option>
+                        <option value="buyer" {{ old('role') == 'buyer' ? 'selected' : '' }}>Buyer</option>
+                        <option value="supplier" {{ old('role') == 'supplier' ? 'selected' : '' }}>Supplier</option>
+                        <option value="pharmacist" {{ old('role') == 'pharmacist' ? 'selected' : '' }}>Pharmacist</option>
+                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                    @error('role')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -45,6 +68,12 @@
                            placeholder="Konfirmasi Password">
                 </div>
             </div>
+
+            @if($errors->has('error'))
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    {{ $errors->first('error') }}
+                </div>
+            @endif
 
             <div>
                 <button type="submit" 

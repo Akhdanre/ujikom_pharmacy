@@ -124,10 +124,33 @@ class EloquentMedicineRepository implements MedicineRepositoryInterface
     
     public function getTopSelling(int $limit = 10): Collection
     {
-        return Medicine::select('medicines.*')
+        return Medicine::select([
+                'medicines.id',
+                'medicines.medicine_name',
+                'medicines.description',
+                'medicines.price',
+                'medicines.stock',
+                'medicines.category_id',
+                'medicines.image_url',
+                'medicines.expired_at',
+                'medicines.created_at',
+                'medicines.updated_at',
+                DB::raw('COALESCE(SUM(sales_transaction_details.quantity), 0) as total_sold')
+            ])
             ->leftJoin('sales_transaction_details', 'medicines.id', '=', 'sales_transaction_details.product_id')
-            ->groupBy('medicines.id')
-            ->orderByRaw('SUM(sales_transaction_details.quantity) DESC')
+            ->groupBy([
+                'medicines.id',
+                'medicines.medicine_name',
+                'medicines.description',
+                'medicines.price',
+                'medicines.stock',
+                'medicines.category_id',
+                'medicines.image_url',
+                'medicines.expired_at',
+                'medicines.created_at',
+                'medicines.updated_at'
+            ])
+            ->orderBy('total_sold', 'desc')
             ->limit($limit)
             ->get();
     }

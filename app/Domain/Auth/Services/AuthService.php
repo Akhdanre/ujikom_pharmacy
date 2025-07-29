@@ -4,7 +4,6 @@ namespace App\Domain\Auth\Services;
 
 use App\Domain\User\Entities\User;
 use App\Domain\User\Repositories\UserRepositoryInterface;
-use App\Domain\User\ValueObjects\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,6 +33,26 @@ class AuthService
         return $user;
     }
 
+    public function loginWithUsername(string $username, string $password): ?User
+    {
+        $user = $this->userRepository->findByUsername($username);
+        
+        if (!$user) {
+            return null;
+        }
+
+        if (!$user->isActive()) {
+            throw new \InvalidArgumentException('Account is deactivated');
+        }
+
+        if (!Hash::check($password, $user->password)) {
+            return null;
+        }
+
+        Auth::login($user);
+        return $user;
+    }
+
     public function register(array $data): User
     {
         $this->validateRegistrationData($data);
@@ -43,9 +62,19 @@ class AuthService
             throw new \InvalidArgumentException('Email already exists');
         }
 
+        // Check if username already exists
+        if (isset($data['username']) && $this->userRepository->findByUsername($data['username'])) {
+            throw new \InvalidArgumentException('Username already exists');
+        }
+
+        // Generate username if not provided
+        if (!isset($data['username'])) {
+            $data['username'] = $this->generateUniqueUsername($data['name']);
+        }
+
         // Set default role if not provided
         if (!isset($data['role'])) {
-            $data['role'] = Role::PELANGGAN;
+            $data['role'] = 'buyer';
         }
 
         // Hash password
@@ -90,7 +119,7 @@ class AuthService
 
     public function updateProfile(User $user, array $data): User
     {
-        $allowedFields = ['name', 'phone', 'address'];
+        $allowedFields = ['name', 'username', 'phone', 'address'];
         
         foreach ($allowedFields as $field) {
             if (isset($data[$field])) {
@@ -103,9 +132,13 @@ class AuthService
 
     public function updateRole(User $user, string $newRole): User
     {
-        $role = new Role($newRole);
-        $user->updateRole($role->getValue());
+        $validRoles = ['admin', 'pharmacist', 'buyer', 'supplier'];
         
+        if (!in_array($newRole, $validRoles)) {
+            throw new \InvalidArgumentException('Invalid role');
+        }
+        
+        $user->updateRole($newRole);
         return $this->userRepository->save($user);
     }
 
@@ -187,10 +220,34 @@ class AuthService
         }
 
         if (isset($data['role'])) {
-            $validRoles = Role::getValidRoles();
+            $validRoles = ['admin', 'pharmacist', 'buyer', 'supplier'];
             if (!in_array($data['role'], $validRoles)) {
                 throw new \InvalidArgumentException('Invalid role');
             }
         }
+
+        if (isset($data['username'])) {
+            if (strlen($data['username']) < 3) {
+                throw new \InvalidArgumentException('Username must be at least 3 characters');
+            }
+            
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $data['username'])) {
+                throw new \InvalidArgumentException('Username can only contain letters, numbers, and underscores');
+            }
+        }
+    }
+
+    private function generateUniqueUsername(string $name): string
+    {
+        $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $name));
+        $username = $baseUsername;
+        $counter = 1;
+
+        while ($this->userRepository->findByUsername($username)) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
     }
 } 

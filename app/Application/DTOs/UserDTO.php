@@ -7,6 +7,7 @@ class UserDTO
     public function __construct(
         public readonly ?int $id,
         public readonly string $name,
+        public readonly string $username,
         public readonly string $email,
         public readonly string $role,
         public readonly ?string $phone,
@@ -22,6 +23,7 @@ class UserDTO
         return new self(
             id: $data['id'] ?? null,
             name: $data['name'],
+            username: $data['username'],
             email: $data['email'],
             role: $data['role'],
             phone: $data['phone'] ?? null,
@@ -38,6 +40,7 @@ class UserDTO
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'username' => $this->username,
             'email' => $this->email,
             'role' => $this->role,
             'phone' => $this->phone,
@@ -54,42 +57,58 @@ class UserDTO
         return $this->role === 'admin';
     }
 
-    public function isApoteker(): bool
+    public function isPharmacist(): bool
     {
-        return $this->role === 'apoteker';
+        return $this->role === 'pharmacist';
     }
 
-    public function isPelanggan(): bool
+    public function isBuyer(): bool
     {
-        return $this->role === 'users_pelanggan';
+        return $this->role === 'buyer';
+    }
+
+    public function isSupplier(): bool
+    {
+        return $this->role === 'supplier';
     }
 
     public function canAccessAdminPanel(): bool
     {
-        return in_array($this->role, ['admin', 'apoteker']);
+        return in_array($this->role, ['admin', 'pharmacist']);
     }
 
     public function canManageMedicines(): bool
     {
-        return in_array($this->role, ['admin', 'apoteker']);
+        return in_array($this->role, ['admin', 'pharmacist']);
     }
 
     public function canManageTransactions(): bool
     {
-        return in_array($this->role, ['admin', 'apoteker']);
+        return in_array($this->role, ['admin', 'pharmacist']);
     }
 
     public function canViewReports(): bool
     {
-        return in_array($this->role, ['admin', 'apoteker']);
+        return in_array($this->role, ['admin', 'pharmacist']);
+    }
+
+    public function canPurchase(): bool
+    {
+        return in_array($this->role, ['buyer', 'supplier']);
+    }
+
+    public function canSell(): bool
+    {
+        return in_array($this->role, ['admin', 'pharmacist', 'supplier']);
     }
 
     public function getRoleDisplayName(): string
     {
         return match($this->role) {
             'admin' => 'Administrator',
-            'apoteker' => 'Apoteker',
-            'users_pelanggan' => 'Pelanggan',
+            'pharmacist' => 'Pharmacist',
+            'buyer' => 'Buyer',
+            'supplier' => 'Supplier',
             default => 'Unknown'
         };
     }
@@ -98,14 +117,15 @@ class UserDTO
     {
         return match($this->role) {
             'admin' => 'red',
-            'apoteker' => 'blue',
-            'users_pelanggan' => 'green',
+            'pharmacist' => 'blue',
+            'buyer' => 'green',
+            'supplier' => 'orange',
             default => 'gray'
         };
     }
 
     public function getDisplayName(): string
     {
-        return $this->name ?: $this->email;
+        return $this->name ?: $this->username ?: $this->email;
     }
 } 

@@ -18,6 +18,21 @@ class AuthApplicationService
         return $user ? $this->entityToDTO($user) : null;
     }
 
+    public function loginWithUsername(string $username, string $password): ?UserDTO
+    {
+        $user = $this->authService->loginWithUsername($username, $password);
+        return $user ? $this->entityToDTO($user) : null;
+    }
+
+    public function loginAndGetUser(string $email, string $password): ?User
+    {
+        $user = $this->authService->login($email, $password);
+        if (!$user) {
+            $user = $this->authService->loginWithUsername($email, $password);
+        }
+        return $user;
+    }
+
     public function register(array $data): UserDTO
     {
         $user = $this->authService->register($data);

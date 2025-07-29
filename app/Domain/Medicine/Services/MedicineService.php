@@ -4,7 +4,6 @@ namespace App\Domain\Medicine\Services;
 
 use App\Domain\Medicine\Entities\Medicine;
 use App\Domain\Medicine\Repositories\MedicineRepositoryInterface;
-use App\Domain\Medicine\ValueObjects\Price;
 use Illuminate\Database\Eloquent\Collection;
 
 class MedicineService
@@ -18,9 +17,9 @@ class MedicineService
         // Validate business rules
         $this->validateMedicineData($data);
         
-        // Check if medicine code already exists
-        if ($this->medicineRepository->findByCode($data['code'])) {
-            throw new \InvalidArgumentException('Medicine code already exists');
+        // Check if medicine name already exists
+        if ($this->medicineRepository->findByName($data['medicine_name'])->isNotEmpty()) {
+            throw new \InvalidArgumentException('Medicine name already exists');
         }
 
         $medicine = new Medicine($data);
@@ -38,10 +37,11 @@ class MedicineService
         // Validate business rules
         $this->validateMedicineData($data);
 
-        // Check if code is being changed and if it already exists
-        if (isset($data['code']) && $data['code'] !== $medicine->code) {
-            if ($this->medicineRepository->findByCode($data['code'])) {
-                throw new \InvalidArgumentException('Medicine code already exists');
+        // Check if name is being changed and if it already exists
+        if (isset($data['medicine_name']) && $data['medicine_name'] !== $medicine->medicine_name) {
+            $existingMedicines = $this->medicineRepository->findByName($data['medicine_name']);
+            if ($existingMedicines->where('id', '!=', $id)->isNotEmpty()) {
+                throw new \InvalidArgumentException('Medicine name already exists');
             }
         }
 
@@ -58,7 +58,7 @@ class MedicineService
         }
 
         // Check if medicine is used in any transactions
-        if ($medicine->transactionDetails()->count() > 0) {
+        if ($medicine->purchaseTransactionDetails()->count() > 0 || $medicine->salesTransactionDetails()->count() > 0) {
             throw new \InvalidArgumentException('Cannot delete medicine that has been used in transactions');
         }
 
@@ -96,9 +96,9 @@ class MedicineService
         return $this->medicineRepository->save($medicine);
     }
 
-    public function getLowStockMedicines(): Collection
+    public function getLowStockMedicines(int $threshold = 10): Collection
     {
-        return $this->medicineRepository->findLowStock();
+        return $this->medicineRepository->findLowStock($threshold);
     }
 
     public function getOutOfStockMedicines(): Collection
@@ -106,14 +106,24 @@ class MedicineService
         return $this->medicineRepository->findOutOfStock();
     }
 
+    public function getExpiredMedicines(): Collection
+    {
+        return $this->medicineRepository->findExpired();
+    }
+
+    public function getExpiringSoonMedicines(int $days = 30): Collection
+    {
+        return $this->medicineRepository->findExpiringSoon($days);
+    }
+
     public function searchMedicines(string $query): Collection
     {
         return $this->medicineRepository->search($query);
     }
 
-    public function getMedicinesByCategory(string $category): Collection
+    public function getMedicinesByCategory(int $categoryId): Collection
     {
-        return $this->medicineRepository->findByCategory($category);
+        return $this->medicineRepository->findByCategory($categoryId);
     }
 
     public function getActiveMedicines(): Collection
@@ -121,12 +131,17 @@ class MedicineService
         return $this->medicineRepository->findActive();
     }
 
+    public function getInactiveMedicines(): Collection
+    {
+        return $this->medicineRepository->findInactive();
+    }
+
     public function calculateTotalInventoryValue(): float
     {
         $medicines = $this->medicineRepository->findActive();
         
         return $medicines->sum(function ($medicine) {
-            return $medicine->price * $medicine->stock_quantity;
+            return $medicine->price * $medicine->stock;
         });
     }
 
@@ -135,47 +150,100 @@ class MedicineService
         $activeMedicines = $this->medicineRepository->findActive();
         $lowStockMedicines = $this->medicineRepository->findLowStock();
         $outOfStockMedicines = $this->medicineRepository->findOutOfStock();
+        $expiredMedicines = $this->medicineRepository->findExpired();
 
         return [
             'total_medicines' => $activeMedicines->count(),
             'low_stock_count' => $lowStockMedicines->count(),
             'out_of_stock_count' => $outOfStockMedicines->count(),
+            'expired_count' => $expiredMedicines->count(),
             'total_value' => $this->calculateTotalInventoryValue(),
             'low_stock_medicines' => $lowStockMedicines,
             'out_of_stock_medicines' => $outOfStockMedicines,
+            'expired_medicines' => $expiredMedicines,
         ];
     }
 
-    public function getPublicMedicines(string $search = '', string $category = ''): Collection
+    public function getPublicMedicines(string $search = '', ?int $categoryId = null): Collection
     {
-        return $this->medicineRepository->findPublicMedicines($search, $category);
+        $query = $this->medicineRepository->findActive();
+        
+        if ($search) {
+            $query = $this->medicineRepository->search($search);
+        }
+        
+        if ($categoryId) {
+            $query = $this->medicineRepository->findByCategory($categoryId);
+        }
+        
+        return $query;
     }
 
-    public function getMedicineCategories(): array
+    public function getTopSellingMedicines(int $limit = 10): Collection
     {
-        return $this->medicineRepository->getCategories();
+        return $this->medicineRepository->getTopSelling($limit);
     }
 
-    public function getFeaturedMedicines(): Collection
+    public function getLowestStockMedicines(int $limit = 10): Collection
     {
-        return $this->medicineRepository->findFeatured();
+        return $this->medicineRepository->getLowestStock($limit);
+    }
+
+    public function getMedicinesByPriceRange(float $minPrice, float $maxPrice): Collection
+    {
+        return $this->medicineRepository->getByPriceRange($minPrice, $maxPrice);
+    }
+
+    public function getMedicinesByStockRange(int $minStock, int $maxStock): Collection
+    {
+        return $this->medicineRepository->getByStockRange($minStock, $maxStock);
     }
 
     public function getRelatedMedicines(int $medicineId): Collection
     {
-        $medicine = $this->findById($medicineId);
+        $medicine = $this->medicineRepository->findById($medicineId);
         if (!$medicine) {
             return collect();
         }
 
-        return $this->medicineRepository->findByCategory($medicine->category)
+        return $this->medicineRepository->findByCategory($medicine->category_id)
             ->where('id', '!=', $medicineId)
             ->take(4);
     }
 
+    public function updateStock(int $medicineId, int $quantity): bool
+    {
+        return $this->medicineRepository->updateStock($medicineId, $quantity);
+    }
+
+    public function getTotalStock(): int
+    {
+        return $this->medicineRepository->getTotalStock();
+    }
+
+    public function getAveragePrice(): float
+    {
+        return $this->medicineRepository->getAveragePrice();
+    }
+
+    public function getMostExpensiveMedicine(): ?Medicine
+    {
+        return $this->medicineRepository->getMostExpensive();
+    }
+
+    public function getLeastExpensiveMedicine(): ?Medicine
+    {
+        return $this->medicineRepository->getLeastExpensive();
+    }
+
+    public function findById(int $id): ?Medicine
+    {
+        return $this->medicineRepository->findById($id);
+    }
+
     private function validateMedicineData(array $data): void
     {
-        $requiredFields = ['code', 'name', 'price', 'stock_quantity', 'min_stock_level'];
+        $requiredFields = ['medicine_name', 'price', 'stock', 'category_id'];
         
         foreach ($requiredFields as $field) {
             if (!isset($data[$field])) {
@@ -187,20 +255,18 @@ class MedicineService
             throw new \InvalidArgumentException('Price cannot be negative');
         }
 
-        if ($data['stock_quantity'] < 0) {
-            throw new \InvalidArgumentException('Stock quantity cannot be negative');
+        if ($data['stock'] < 0) {
+            throw new \InvalidArgumentException('Stock cannot be negative');
         }
 
-        if ($data['min_stock_level'] < 0) {
-            throw new \InvalidArgumentException('Minimum stock level cannot be negative');
-        }
-
-        if (strlen($data['code']) < 3) {
-            throw new \InvalidArgumentException('Medicine code must be at least 3 characters');
-        }
-
-        if (strlen($data['name']) < 2) {
+        if (strlen($data['medicine_name']) < 2) {
             throw new \InvalidArgumentException('Medicine name must be at least 2 characters');
+        }
+
+        if (isset($data['expired_at']) && $data['expired_at']) {
+            if (strtotime($data['expired_at']) < time()) {
+                throw new \InvalidArgumentException('Expired date cannot be in the past');
+            }
         }
     }
 } 

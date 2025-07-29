@@ -73,7 +73,7 @@
         <h2 class="text-2xl font-bold text-gray-900 mb-6">Kategori Obat</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <a href="{{ route('home') }}" 
-               class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center {{ !$category ? 'ring-2 ring-green-500' : '' }}">
+               class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center {{ !$categoryId ? 'ring-2 ring-green-500' : '' }}">
                 <div class="text-green-600 mb-2">
                     <svg class="h-8 w-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
@@ -82,14 +82,14 @@
                 <span class="text-sm font-medium">Semua</span>
             </a>
             @foreach($categories as $cat)
-            <a href="{{ route('home', ['category' => $cat]) }}" 
-               class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center {{ $category === $cat ? 'ring-2 ring-green-500' : '' }}">
+            <a href="{{ route('home', ['category_id' => $cat['id']]) }}" 
+               class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow text-center {{ $categoryId == $cat['id'] ? 'ring-2 ring-green-500' : '' }}">
                 <div class="text-green-600 mb-2">
                     <svg class="h-8 w-8 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                     </svg>
                 </div>
-                <span class="text-sm font-medium">{{ $cat }}</span>
+                <span class="text-sm font-medium">{{ $cat['category_name'] }}</span>
             </a>
             @endforeach
         </div>
@@ -99,26 +99,24 @@
     <!-- Featured Products -->
     @if(count($featuredMedicines) > 0)
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h2 class="text-2xl font-bold text-gray-900 mb-6">Produk Unggulan</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Produk Terlaris</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($featuredMedicines as $medicine)
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
                 <div class="p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-gray-500">{{ $medicine->code }}</span>
+                        <span class="text-xs font-medium text-gray-500">{{ $medicine['id'] }}</span>
                         <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                            {{ $medicine->category }}
+                            {{ $medicine['category_name'] ?? 'N/A' }}
                         </span>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">{{ $medicine->name }}</h3>
-                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $medicine->description }}</p>
-                    <div class="flex items-center justify-between">
-                        <span class="text-lg font-bold text-green-600">{{ $medicine->getFormattedPrice() }}</span>
-                        <span class="text-sm text-gray-500">Stok: {{ $medicine->stock_quantity }}</span>
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ $medicine['medicine_name'] }}</h3>
+                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $medicine['description'] }}</p>
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-lg font-bold text-green-600">Rp {{ number_format($medicine['price'], 0, ',', '.') }}</span>
+                        <span class="text-sm text-gray-500">Stok: {{ $medicine['stock'] }}</span>
                     </div>
-                </div>
-                <div class="px-4 pb-4">
-                    <a href="{{ route('medicine.detail', $medicine->id) }}" 
+                    <a href="{{ route('medicine.detail', $medicine['id']) }}" 
                        class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-md font-medium">
                         Lihat Detail
                     </a>
@@ -133,8 +131,12 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900">
-                @if($category)
-                    Produk {{ $category }}
+                @if($categoryId)
+                    @php
+                        $selectedCategory = collect($categories)->firstWhere('id', $categoryId);
+                        $categoryName = $selectedCategory ? $selectedCategory['category_name'] : 'Unknown';
+                    @endphp
+                    Produk {{ $categoryName }}
                 @else
                     Semua Produk
                 @endif
@@ -148,18 +150,18 @@
             <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
                 <div class="p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-xs font-medium text-gray-500">{{ $medicine->code }}</span>
+                        <span class="text-xs font-medium text-gray-500">{{ $medicine['id'] }}</span>
                         <span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
-                            {{ $medicine->category }}
+                            {{ $medicine['category_name'] ?? 'N/A' }}
                         </span>
                     </div>
-                    <h3 class="font-semibold text-gray-900 mb-2">{{ $medicine->name }}</h3>
-                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $medicine->description }}</p>
+                    <h3 class="font-semibold text-gray-900 mb-2">{{ $medicine['medicine_name'] }}</h3>
+                    <p class="text-sm text-gray-600 mb-3 line-clamp-2">{{ $medicine['description'] }}</p>
                     <div class="flex items-center justify-between mb-3">
-                        <span class="text-lg font-bold text-green-600">{{ $medicine->getFormattedPrice() }}</span>
-                        <span class="text-sm text-gray-500">Stok: {{ $medicine->stock_quantity }}</span>
+                        <span class="text-lg font-bold text-green-600">Rp {{ number_format($medicine['price'], 0, ',', '.') }}</span>
+                        <span class="text-sm text-gray-500">Stok: {{ $medicine['stock'] }}</span>
                     </div>
-                    <a href="{{ route('medicine.detail', $medicine->id) }}" 
+                    <a href="{{ route('medicine.detail', $medicine['id']) }}" 
                        class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-md font-medium">
                         Lihat Detail
                     </a>

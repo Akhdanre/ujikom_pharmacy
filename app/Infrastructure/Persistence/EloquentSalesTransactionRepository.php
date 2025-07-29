@@ -6,6 +6,7 @@ use App\Domain\Sales\Entities\SalesTransaction;
 use App\Domain\Sales\Repositories\SalesTransactionRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class EloquentSalesTransactionRepository implements SalesTransactionRepositoryInterface
 {
@@ -70,7 +71,7 @@ class EloquentSalesTransactionRepository implements SalesTransactionRepositoryIn
         return SalesTransaction::whereBetween('total_price', [$minPrice, $maxPrice])->get();
     }
     
-    public function getTotalSalesAmount(string $startDate = null, string $endDate = null): float
+    public function getTotalSalesAmount(?string $startDate = null, ?string $endDate = null): float
     {
         $query = SalesTransaction::where('status', 'completed');
         
@@ -81,7 +82,7 @@ class EloquentSalesTransactionRepository implements SalesTransactionRepositoryIn
         return $query->sum('total_price');
     }
     
-    public function getSalesCount(string $startDate = null, string $endDate = null): int
+    public function getSalesCount(?string $startDate = null, ?string $endDate = null): int
     {
         $query = SalesTransaction::query();
         
@@ -92,7 +93,7 @@ class EloquentSalesTransactionRepository implements SalesTransactionRepositoryIn
         return $query->count();
     }
     
-    public function getAverageSalesAmount(string $startDate = null, string $endDate = null): float
+    public function getAverageSalesAmount(?string $startDate = null, ?string $endDate = null): float
     {
         $query = SalesTransaction::where('status', 'completed');
         
@@ -141,14 +142,19 @@ class EloquentSalesTransactionRepository implements SalesTransactionRepositoryIn
     
     public function getTopSellingProducts(int $limit = 10): Collection
     {
-        return SalesTransaction::select('sales_transaction_details.product_id')
-            ->join('sales_transaction_details', 'sales_transactions.transaction_id', '=', 'sales_transaction_details.transaction_id')
-            ->selectRaw('SUM(sales_transaction_details.quantity) as total_quantity')
-            ->selectRaw('SUM(sales_transaction_details.quantity * sales_transaction_details.price) as total_revenue')
+        $results = DB::table('sales_transaction_details')
+            ->select([
+                'sales_transaction_details.product_id',
+                DB::raw('SUM(sales_transaction_details.quantity) as total_quantity'),
+                DB::raw('SUM(sales_transaction_details.quantity * sales_transaction_details.price) as total_revenue')
+            ])
             ->groupBy('sales_transaction_details.product_id')
             ->orderBy('total_quantity', 'desc')
             ->limit($limit)
             ->get();
+
+        // Convert to Eloquent Collection
+        return new Collection($results);
     }
     
     public function getSalesByProduct(int $productId): Collection

@@ -47,21 +47,33 @@ class MedicineApplicationService
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
-    public function getMedicinesByCategory(string $category): array
+    public function getMedicinesByCategory(int $categoryId): array
     {
-        $medicines = $this->medicineService->getMedicinesByCategory($category);
+        $medicines = $this->medicineService->getMedicinesByCategory($categoryId);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
-    public function getLowStockMedicines(): array
+    public function getLowStockMedicines(int $threshold = 10): array
     {
-        $medicines = $this->medicineService->getLowStockMedicines();
+        $medicines = $this->medicineService->getLowStockMedicines($threshold);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
     public function getOutOfStockMedicines(): array
     {
         $medicines = $this->medicineService->getOutOfStockMedicines();
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getExpiredMedicines(): array
+    {
+        $medicines = $this->medicineService->getExpiredMedicines();
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getExpiringSoonMedicines(int $days = 30): array
+    {
+        $medicines = $this->medicineService->getExpiringSoonMedicines($days);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
@@ -90,6 +102,10 @@ class MedicineApplicationService
             ->map(fn($medicine) => $this->entityToDTO($medicine))
             ->toArray();
 
+        $report['expired_medicines'] = collect($report['expired_medicines'])
+            ->map(fn($medicine) => $this->entityToDTO($medicine))
+            ->toArray();
+
         return $report;
     }
 
@@ -98,32 +114,51 @@ class MedicineApplicationService
         $activeMedicines = $this->medicineService->getActiveMedicines();
         $lowStockMedicines = $this->medicineService->getLowStockMedicines();
         $outOfStockMedicines = $this->medicineService->getOutOfStockMedicines();
+        $expiredMedicines = $this->medicineService->getExpiredMedicines();
         $totalValue = $this->medicineService->calculateTotalInventoryValue();
+        $totalStock = $this->medicineService->getTotalStock();
+        $averagePrice = $this->medicineService->getAveragePrice();
 
         return [
             'total_medicines' => $activeMedicines->count(),
             'low_stock_count' => $lowStockMedicines->count(),
             'out_of_stock_count' => $outOfStockMedicines->count(),
+            'expired_count' => $expiredMedicines->count(),
             'total_inventory_value' => $totalValue,
             'formatted_total_value' => 'Rp ' . number_format($totalValue, 0, ',', '.'),
-            'average_price' => $activeMedicines->count() > 0 ? $activeMedicines->avg('price') : 0,
+            'total_stock' => $totalStock,
+            'average_price' => $averagePrice,
+            'formatted_average_price' => 'Rp ' . number_format($averagePrice, 0, ',', '.'),
         ];
     }
 
-    public function getPublicMedicines(string $search = '', string $category = ''): array
+    public function getPublicMedicines(string $search = '', ?int $categoryId = null): array
     {
-        $medicines = $this->medicineService->getPublicMedicines($search, $category);
+        $medicines = $this->medicineService->getPublicMedicines($search, $categoryId);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
-    public function getMedicineCategories(): array
+    public function getTopSellingMedicines(int $limit = 10): array
     {
-        return $this->medicineService->getMedicineCategories();
+        $medicines = $this->medicineService->getTopSellingMedicines($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
-    public function getFeaturedMedicines(): array
+    public function getLowestStockMedicines(int $limit = 10): array
     {
-        $medicines = $this->medicineService->getFeaturedMedicines();
+        $medicines = $this->medicineService->getLowestStockMedicines($limit);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByPriceRange(float $minPrice, float $maxPrice): array
+    {
+        $medicines = $this->medicineService->getMedicinesByPriceRange($minPrice, $maxPrice);
+        return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function getMedicinesByStockRange(int $minStock, int $maxStock): array
+    {
+        $medicines = $this->medicineService->getMedicinesByStockRange($minStock, $maxStock);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
     }
 
@@ -137,6 +172,23 @@ class MedicineApplicationService
     {
         $medicines = $this->medicineService->getRelatedMedicines($medicineId);
         return $medicines->map(fn($medicine) => $this->entityToDTO($medicine))->toArray();
+    }
+
+    public function updateStock(int $medicineId, int $quantity): bool
+    {
+        return $this->medicineService->updateStock($medicineId, $quantity);
+    }
+
+    public function getMostExpensiveMedicine(): ?MedicineDTO
+    {
+        $medicine = $this->medicineService->getMostExpensiveMedicine();
+        return $medicine ? $this->entityToDTO($medicine) : null;
+    }
+
+    public function getLeastExpensiveMedicine(): ?MedicineDTO
+    {
+        $medicine = $this->medicineService->getLeastExpensiveMedicine();
+        return $medicine ? $this->entityToDTO($medicine) : null;
     }
 
     private function entityToDTO($medicine): MedicineDTO
