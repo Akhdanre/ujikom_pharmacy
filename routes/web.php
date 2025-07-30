@@ -1,23 +1,21 @@
 <?php
 
-use App\Presentation\Controllers\Web\MedicineController;
-use App\Presentation\Controllers\Web\SellTransactionController;
-use App\Presentation\Controllers\Web\BuyTransactionController;
-use App\Presentation\Controllers\Auth\LoginController;
-use App\Presentation\Controllers\Auth\RegisterController;
-use App\Presentation\Controllers\EcommerceController;
+
+use App\Http\Controllers\UserHome\UserHomeController;
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// Public E-commerce Routes (Tokopedia/Shopee Style)
-Route::get('/', [EcommerceController::class, 'index'])->name('home');
-Route::get('/products', [EcommerceController::class, 'products'])->name('products');
-Route::get('/product/{id}', [EcommerceController::class, 'productDetail'])->name('product.detail');
-Route::get('/category/{category}', [EcommerceController::class, 'category'])->name('category');
-Route::get('/search', [EcommerceController::class, 'search'])->name('search');
-Route::get('/cart', [EcommerceController::class, 'cart'])->name('cart');
-Route::get('/checkout', [EcommerceController::class, 'checkout'])->name('checkout');
-Route::get('/about', [EcommerceController::class, 'about'])->name('about');
-Route::get('/contact', [EcommerceController::class, 'contact'])->name('contact');
+Route::get('/', [UserHomeController::class, 'index'])->name('home');
+Route::get('/products', [UserHomeController::class, 'products'])->name('products');
+Route::get('/product/{id}', [UserHomeController::class, 'productDetail'])->name('product.detail');
+Route::get('/category/{category}', [UserHomeController::class, 'category'])->name('category');
+Route::get('/search', [UserHomeController::class, 'search'])->name('search');
+Route::get('/cart', [UserHomeController::class, 'cart'])->name('cart');
+Route::get('/checkout', [UserHomeController::class, 'checkout'])->name('checkout');
+Route::get('/about', [UserHomeController::class, 'about'])->name('about');
+Route::get('/contact', [UserHomeController::class, 'contact'])->name('contact');
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -30,30 +28,25 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
-Route::middleware([
-    'auth',
-    'admin'
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('pages.dashboard.index');
-    })->name('dashboard');
+// Role-based redirect after login
+Route::get('/dashboard', function () {
+    $user = Auth::user();
 
-    // Medicine Routes
-    Route::resource('medicines', MedicineController::class);
+    if (!$user) {
+        return redirect()->route('login');
+    }
 
-    // Additional Medicine Routes
-    Route::get('medicines/search', [MedicineController::class, 'search'])->name('medicines.search');
-    Route::get('medicines/low-stock', [MedicineController::class, 'lowStock'])->name('medicines.low-stock');
-    Route::get('medicines/out-of-stock', [MedicineController::class, 'outOfStock'])->name('medicines.out-of-stock');
-    Route::get('medicines/expired', [MedicineController::class, 'expired'])->name('medicines.expired');
-    Route::get('medicines/expiring-soon', [MedicineController::class, 'expiringSoon'])->name('medicines.expiring-soon');
-    Route::get('medicines/inventory/report', [MedicineController::class, 'inventoryReport'])->name('medicines.inventory-report');
+    return match ($user->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'pharmacist' => redirect()->route('pharmacist.dashboard'),
+        'buyer' => redirect()->route('user.dashboard'),
+        default => redirect()->route('home')
+    };
+})->name('dashboard')->middleware('auth');
 
-    // Transaction Routes
-    Route::resource('transactions', SellTransactionController::class);
-
-    // Buy Transaction Routes
-    Route::resource('buy-transactions', BuyTransactionController::class);
-});
+// Include role-based routes
+require __DIR__ . '/roles/user.php';
+require __DIR__ . '/roles/pharmacist.php';
+require __DIR__ . '/roles/admin.php';
 
 require __DIR__ . '/auth.php';

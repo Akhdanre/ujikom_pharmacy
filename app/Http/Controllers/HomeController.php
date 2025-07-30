@@ -1,21 +1,18 @@
 <?php
 
-namespace App\Presentation\Controllers;
+namespace App\Http\Controllers;
 
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
-class HomeController extends BaseController
-{
-    public function index(Request $request): View
-    {
+class HomeController extends BaseController {
+    public function index(Request $request): View {
         // Return static home page without service dependencies
         return view('pages.home');
     }
 
-    public function show($id): View
-    {
+    public function show($id): View {
         // For now, return a simple message
         return view('pages.medicine-detail', [
             'medicine' => null,
@@ -23,8 +20,7 @@ class HomeController extends BaseController
         ]);
     }
 
-    public function category($categoryId): View
-    {
+    public function category($categoryId): View {
         // For now, return a simple message
         return view('pages.medicine-detail', [
             'medicines' => [],
@@ -32,4 +28,4 @@ class HomeController extends BaseController
             'category' => null
         ]);
     }
-} 
+}

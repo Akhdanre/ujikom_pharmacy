@@ -1,13 +1,11 @@
 <?php
 
-namespace App\Livewire\Medicine;
+namespace App\Http\Livewire\Medicine;
 
 use App\Application\Services\MedicineApplicationService;
-use App\Application\DTOs\MedicineDTO;
 use Livewire\Component;
 
-class MedicineForm extends Component
-{
+class MedicineForm extends Component {
     public $medicineId = null;
     public $code = '';
     public $name = '';
@@ -43,15 +41,13 @@ class MedicineForm extends Component
         'is_active' => 'boolean'
     ];
 
-    public function mount($medicineId = null)
-    {
+    public function mount($medicineId = null) {
         if ($medicineId) {
             $this->loadMedicine($medicineId);
         }
     }
 
-    public function loadMedicine($id)
-    {
+    public function loadMedicine($id) {
         $medicineService = app(MedicineApplicationService::class);
         $medicine = $medicineService->getMedicine($id);
 
@@ -69,13 +65,12 @@ class MedicineForm extends Component
         }
     }
 
-    public function save()
-    {
+    public function save() {
         $this->validate();
 
         try {
             $medicineService = app(MedicineApplicationService::class);
-            
+
             $data = [
                 'code' => $this->code,
                 'name' => $this->name,
@@ -98,7 +93,6 @@ class MedicineForm extends Component
 
             $this->resetForm();
             $this->dispatch('medicine-saved', $medicine->toArray());
-
         } catch (\InvalidArgumentException $e) {
             session()->flash('error', $e->getMessage());
         } catch (\Exception $e) {
@@ -106,17 +100,22 @@ class MedicineForm extends Component
         }
     }
 
-    public function resetForm()
-    {
+    public function resetForm() {
         $this->reset([
-            'medicineId', 'code', 'name', 'description', 'category',
-            'price', 'stock_quantity', 'min_stock_level', 'supplier_id'
+            'medicineId',
+            'code',
+            'name',
+            'description',
+            'category',
+            'price',
+            'stock_quantity',
+            'min_stock_level',
+            'supplier_id'
         ]);
         $this->is_active = true;
     }
 
-    public function render()
-    {
+    public function render() {
         return view('livewire.medicine.medicine-form');
     }
-} 
+}

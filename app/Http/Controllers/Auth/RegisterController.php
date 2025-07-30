@@ -1,25 +1,24 @@
 <?php
 
-namespace App\Presentation\Controllers\Auth;
+namespace App\Http\Controllers\Auth;
 
 use App\Application\Services\AuthApplicationService;
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules;
 
-class RegisterController extends BaseController
-{
+class RegisterController extends BaseController {
     public function __construct(
         private AuthApplicationService $authApplicationService
-    ) {}
+    ) {
+    }
 
-    public function showRegistrationForm()
-    {
+    public function showRegistrationForm() {
         return view('pages.auth.register');
     }
 
-    public function register(Request $request)
-    {
+    public function register(Request $request) {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'username' => ['nullable', 'string', 'max:255', 'unique:users,username'],
@@ -40,11 +39,11 @@ class RegisterController extends BaseController
             $userDTO = $this->authApplicationService->register($userData);
 
             // Login the user after successful registration
-            auth()->login(\App\Models\User::find($userDTO->id));
+            Auth::login(\App\Models\User::find($userDTO->id));
 
             return redirect()->route('dashboard')->with('success', 'Registration successful!');
         } catch (\InvalidArgumentException $e) {
             return back()->withErrors(['error' => $e->getMessage()])->withInput();
         }
     }
-} 
+}

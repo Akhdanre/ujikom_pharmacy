@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Presentation\Controllers\Web;
+namespace App\Http\Controllers\SellTransaction;
 
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 class SellTransactionController extends BaseController {

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Presentation\Controllers\Web;
+namespace App\Http\Controllers\Medicine;
 
 use App\Application\Services\MedicineApplicationService;
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;

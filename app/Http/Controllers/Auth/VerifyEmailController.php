@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Presentation\Controllers\Auth;
+namespace App\Http\Controllers\Auth;
 
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
 class VerifyEmailController extends BaseController
@@ -42,4 +42,4 @@ class VerifyEmailController extends BaseController
 
         return response()->json(['message' => 'Verification link sent!']);
     }
-} 
+}

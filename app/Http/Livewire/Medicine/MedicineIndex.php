@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Livewire\Medicine;
+namespace App\Http\Livewire\Medicine;
 
 use App\Application\Services\MedicineApplicationService;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class MedicineIndex extends Component
-{
+class MedicineIndex extends Component {
     use WithPagination;
 
     public $search = '';
@@ -22,48 +21,40 @@ class MedicineIndex extends Component
         'stockStatus' => ['except' => ''],
     ];
 
-    public function mount()
-    {
+    public function mount() {
         // Initialize component
     }
 
-    public function updatedSearch()
-    {
+    public function updatedSearch() {
         $this->resetPage();
     }
 
-    public function updatedCategory()
-    {
+    public function updatedCategory() {
         $this->resetPage();
     }
 
-    public function updatedStockStatus()
-    {
+    public function updatedStockStatus() {
         $this->resetPage();
     }
 
-    public function toggleLowStock()
-    {
+    public function toggleLowStock() {
         $this->showLowStock = !$this->showLowStock;
         $this->resetPage();
     }
 
-    public function toggleOutOfStock()
-    {
+    public function toggleOutOfStock() {
         $this->showOutOfStock = !$this->showOutOfStock;
         $this->resetPage();
     }
 
-    public function clearFilters()
-    {
+    public function clearFilters() {
         $this->reset(['search', 'category', 'stockStatus', 'showLowStock', 'showOutOfStock']);
         $this->resetPage();
     }
 
-    public function render()
-    {
+    public function render() {
         $medicineService = app(MedicineApplicationService::class);
-        
+
         $medicines = [];
         $statistics = [];
 
@@ -86,4 +77,4 @@ class MedicineIndex extends Component
             'statistics' => $statistics
         ]);
     }
-} 
+}

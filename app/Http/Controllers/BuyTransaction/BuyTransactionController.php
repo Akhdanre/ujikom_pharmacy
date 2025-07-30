@@ -1,14 +1,12 @@
 <?php
 
-namespace App\Presentation\Controllers\Web;
+namespace App\Http\Controllers\BuyTransaction;
 
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 
-class BuyTransactionController extends BaseController
-{
-    public function index()
-    {
+class BuyTransactionController extends BaseController {
+    public function index() {
         // Dummy data for buy transactions (purchases from suppliers)
         $buyTransactions = [
             [
@@ -112,8 +110,7 @@ class BuyTransactionController extends BaseController
         return view('features.buy-transactions.index', compact('buyTransactions'));
     }
 
-    public function create()
-    {
+    public function create() {
         // Dummy suppliers for dropdown
         $suppliers = [
             ['id' => 1, 'name' => 'PT. Medika Sejahtera', 'phone' => '+62 21-555-0123', 'email' => 'contact@medikasejahtera.com'],
@@ -137,8 +134,7 @@ class BuyTransactionController extends BaseController
         return view('features.buy-transactions.create', compact('suppliers', 'medicines'));
     }
 
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         // Validate the request
         $request->validate([
             'supplier_id' => 'required|integer',
@@ -155,8 +151,7 @@ class BuyTransactionController extends BaseController
             ->with('success', 'Buy transaction created successfully!');
     }
 
-    public function show($id)
-    {
+    public function show($id) {
         // Dummy buy transaction data
         $buyTransaction = [
             'id' => $id,
@@ -181,8 +176,7 @@ class BuyTransactionController extends BaseController
         return view('features.buy-transactions.show', compact('buyTransaction'));
     }
 
-    public function edit($id)
-    {
+    public function edit($id) {
         // Dummy buy transaction data for editing
         $buyTransaction = [
             'id' => $id,
@@ -211,8 +205,7 @@ class BuyTransactionController extends BaseController
         return view('features.buy-transactions.edit', compact('buyTransaction', 'suppliers', 'medicines'));
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         // Validate the request
         $request->validate([
             'supplier_id' => 'required|integer',
@@ -230,10 +223,9 @@ class BuyTransactionController extends BaseController
             ->with('success', 'Buy transaction updated successfully!');
     }
 
-    public function destroy($id)
-    {
+    public function destroy($id) {
         // In a real application, you would delete from database here
         return redirect()->route('buy-transactions.index')
             ->with('success', 'Buy transaction deleted successfully!');
     }
-} 
+}

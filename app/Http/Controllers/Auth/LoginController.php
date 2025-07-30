@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Presentation\Controllers\Auth;
+namespace App\Http\Controllers\Auth;
+
 
 use App\Application\Services\AuthApplicationService;
-use App\Presentation\Controllers\BaseController;
+use App\Http\Controllers\BaseController;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Auth;
