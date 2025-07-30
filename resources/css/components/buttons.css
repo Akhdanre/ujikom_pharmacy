@@ -84,4 +84,21 @@
 .btn-info:hover {
     background-color: var(--info-600) !important;
     border-color: var(--info-600) !important;
-} 
+}
+
+.btn-add-cart {
+    background: var(--primary-500);
+    color: var(--text-inverse);
+    border: none;
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: var(--transition-normal);
+    width: 100%;
+}
+
+.btn-add-cart:hover {
+    background: var(--primary-600);
+    color: var(--text-inverse);
+    transform: scale(1.05);
+}

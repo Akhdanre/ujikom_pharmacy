@@ -1,0 +1,7 @@
+.main-header {
+    background: var(--bg-primary);
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}

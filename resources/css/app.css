@@ -10,12 +10,16 @@
 
 /* Utilities */
 @import "./utilities/colors.css";
+@import "./utilities/header.css";
 
 /* Components */
 @import "./components/buttons.css";
 @import "./components/card.css";
 @import "./components/badge.css";
 @import "./components/sidebar.css";
+@import "./components/dropdown.css";
+@import "./components/image.css";
+@import "./components/teks.css";
 
 /* Bootstrap Overrides */
 @import "./override/bootstrap.css";
