@@ -264,7 +264,7 @@
     </style>
 </head>
 <body>
-    <!-- Top Header -->
+    <!-- Top Header
     <div class="top-header">
         <div class="container">
             <div class="row align-items-center">
@@ -282,7 +282,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Main Header -->
     <header class="main-header">

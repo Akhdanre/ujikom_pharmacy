@@ -23,7 +23,7 @@ class UserHomeController extends BaseController {
         $categories = $this->categoryService->getAllCategories();
         $popularMedicines = $this->medicineService->getPopularMedicines();
 
-        return view('ecommerce.home', compact('featuredMedicines', 'categories', 'popularMedicines'));
+        return view('pages.ecommerce.home', compact('featuredMedicines', 'categories', 'popularMedicines'));
     }
 
     public function products(Request $request): View {
@@ -45,14 +45,14 @@ class UserHomeController extends BaseController {
 
         $categories = $this->categoryService->getAllCategories();
 
-        return view('ecommerce.products', compact('medicines', 'categories', 'search', 'category', 'sort', 'order', 'minPrice', 'maxPrice'));
+        return view('pages.ecommerce.products', compact('medicines', 'categories', 'search', 'category', 'sort', 'order', 'minPrice', 'maxPrice'));
     }
 
     public function productDetail($id): View {
         $medicine = $this->medicineService->getMedicineById($id);
         $relatedMedicines = $this->medicineService->getRelatedMedicines($id);
 
-        return view('ecommerce.product-detail', compact('medicine', 'relatedMedicines'));
+        return view('pages.ecommerce.product-detail', compact('medicine', 'relatedMedicines'));
     }
 
     public function category($categoryId): View {
@@ -60,7 +60,7 @@ class UserHomeController extends BaseController {
         $category = $this->categoryService->getCategoryById($categoryId);
         $categories = $this->categoryService->getAllCategories();
 
-        return view('ecommerce.category', compact('medicines', 'category', 'categories'));
+        return view('pages.ecommerce.category', compact('medicines', 'category', 'categories'));
     }
 
     public function search(Request $request): View {
@@ -68,22 +68,22 @@ class UserHomeController extends BaseController {
         $medicines = $this->medicineService->searchMedicines($query);
         $categories = $this->categoryService->getAllCategories();
 
-        return view('ecommerce.search', compact('medicines', 'categories', 'query'));
+        return view('pages.ecommerce.search', compact('medicines', 'categories', 'query'));
     }
 
     public function cart(): View {
-        return view('ecommerce.cart');
+        return view('pages.ecommerce.cart');
     }
 
     public function checkout(): View {
-        return view('ecommerce.checkout');
+        return view('pages.ecommerce.checkout');
     }
 
     public function about(): View {
-        return view('ecommerce.about');
+        return view('pages.ecommerce.about');
     }
 
     public function contact(): View {
-        return view('ecommerce.contact');
+        return view('pages.ecommerce.contact');
     }
 }

@@ -1,0 +1,49 @@
+/* ========================================
+   SIDEBAR COMPONENT STYLES
+   ======================================== */
+
+/* Sidebar Styles */
+.sidebar {
+    background-color: var(--primary-700);
+    min-height: 100vh;
+    border-right: 2px solid var(--primary-500);
+}
+
+.sidebar-header {
+    background-color: var(--primary-500);
+    padding: var(--spacing-md);
+}
+
+.sidebar-nav .nav-link {
+    color: var(--text-inverse);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-xs);
+    transition: var(--transition-normal);
+}
+
+.sidebar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.sidebar-nav .nav-link.active {
+    background-color: var(--primary-500);
+    color: var(--text-inverse);
+}
+
+/* Main Content */
+.main-content {
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+}
+
+/* Mobile Sidebar */
+.mobile-sidebar {
+    background-color: var(--primary-700);
+    z-index: 1050;
+}
+
+.mobile-sidebar-backdrop {
+    background-color: var(--bg-overlay);
+    z-index: 1040;
+} 

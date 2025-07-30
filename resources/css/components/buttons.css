@@ -1,0 +1,87 @@
+/* ========================================
+   BUTTON COMPONENT STYLES
+   ======================================== */
+
+/* Primary Button */
+.btn-primary {
+    background-color: var(--primary-500) !important;
+    border-color: var(--primary-500) !important;
+    color: var(--text-inverse) !important;
+    transition: var(--transition-normal);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-600) !important;
+    border-color: var(--primary-600) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:focus {
+    background-color: var(--primary-700) !important;
+    border-color: var(--primary-700) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 191, 166, 0.25) !important;
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: var(--secondary-500) !important;
+    border-color: var(--secondary-500) !important;
+    color: var(--text-inverse) !important;
+    transition: var(--transition-normal);
+}
+
+.btn-secondary:hover {
+    background-color: var(--secondary-600) !important;
+    border-color: var(--secondary-600) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Success Button */
+.btn-success {
+    background-color: var(--success-500) !important;
+    border-color: var(--success-500) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-success:hover {
+    background-color: var(--success-600) !important;
+    border-color: var(--success-600) !important;
+}
+
+/* Warning Button */
+.btn-warning {
+    background-color: var(--warning-500) !important;
+    border-color: var(--warning-500) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-warning:hover {
+    background-color: var(--warning-600) !important;
+    border-color: var(--warning-600) !important;
+}
+
+/* Danger Button */
+.btn-danger {
+    background-color: var(--error-500) !important;
+    border-color: var(--error-500) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-danger:hover {
+    background-color: var(--error-600) !important;
+    border-color: var(--error-600) !important;
+}
+
+/* Info Button */
+.btn-info {
+    background-color: var(--info-500) !important;
+    border-color: var(--info-500) !important;
+    color: var(--text-inverse) !important;
+}
+
+.btn-info:hover {
+    background-color: var(--info-600) !important;
+    border-color: var(--info-600) !important;
+} 

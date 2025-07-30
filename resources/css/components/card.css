@@ -1,0 +1,29 @@
+/* ========================================
+   CARD COMPONENT STYLES
+   ======================================== */
+
+/* Card Styles */
+.card-custom {
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+}
+
+.card-custom:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.card-custom.card-success {
+    border-color: var(--border-success);
+}
+
+.card-custom.card-warning {
+    border-color: var(--border-warning);
+}
+
+.card-custom.card-error {
+    border-color: var(--border-error);
+} 
