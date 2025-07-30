@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\UserHomeController;
+
 use Illuminate\Support\Facades\Route;
 
 // User/Buyer Routes

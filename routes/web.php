@@ -1,21 +1,47 @@
 <?php
 
-
-use App\Http\Controllers\UserHome\UserHomeController;
+use App\Http\Controllers\UserHomeController;
+use App\Http\Controllers\Ecommerce\HomeController;
+use App\Http\Controllers\Ecommerce\ProductsController;
+use App\Http\Controllers\Ecommerce\ProductDetailController;
+use App\Http\Controllers\Ecommerce\CartController;
+use App\Http\Controllers\Ecommerce\SearchController;
+use App\Http\Controllers\Ecommerce\AboutController;
+use App\Http\Controllers\Ecommerce\ContactController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', [UserHomeController::class, 'index'])->name('home');
-Route::get('/products', [UserHomeController::class, 'products'])->name('products');
-Route::get('/product/{id}', [UserHomeController::class, 'productDetail'])->name('product.detail');
-Route::get('/category/{category}', [UserHomeController::class, 'category'])->name('category');
-Route::get('/search', [UserHomeController::class, 'search'])->name('search');
-Route::get('/cart', [UserHomeController::class, 'cart'])->name('cart');
-Route::get('/checkout', [UserHomeController::class, 'checkout'])->name('checkout');
-Route::get('/about', [UserHomeController::class, 'about'])->name('about');
-Route::get('/contact', [UserHomeController::class, 'contact'])->name('contact');
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Ecommerce Products
+Route::get('/ecommerce/products', [ProductsController::class, 'index'])->name('ecommerce.products');
+
+// Ecommerce Product Detail
+Route::get('/ecommerce/products/{id}', [ProductDetailController::class, 'show'])->name('ecommerce.product.detail');
+
+// Ecommerce Cart
+Route::get('/ecommerce/cart', [CartController::class, 'index'])->name('ecommerce.cart');
+Route::post('/ecommerce/cart/add', [CartController::class, 'addToCart'])->name('ecommerce.cart.add');
+Route::put('/ecommerce/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('ecommerce.cart.update-quantity');
+Route::delete('/ecommerce/cart/remove-item', [CartController::class, 'removeItem'])->name('ecommerce.cart.remove-item');
+Route::post('/ecommerce/cart/apply-coupon', [CartController::class, 'applyCoupon'])->name('ecommerce.cart.apply-coupon');
+
+// Ecommerce Search
+Route::get('/ecommerce/search', [SearchController::class, 'index'])->name('ecommerce.search');
+Route::get('/ecommerce/search/suggestions', [SearchController::class, 'suggestions'])->name('ecommerce.search.suggestions');
+
+// Ecommerce About
+Route::get('/ecommerce/about', [AboutController::class, 'index'])->name('ecommerce.about');
+
+// Ecommerce Contact
+Route::get('/ecommerce/contact', [ContactController::class, 'index'])->name('ecommerce.contact');
+Route::post('/ecommerce/contact/send-message', [ContactController::class, 'sendMessage'])->name('ecommerce.contact.send-message');
+Route::post('/ecommerce/contact/subscribe-newsletter', [ContactController::class, 'subscribeNewsletter'])->name('ecommerce.contact.subscribe-newsletter');
+
+
 
 // Auth Routes
 Route::middleware('guest')->group(function () {
@@ -40,7 +66,7 @@ Route::get('/dashboard', function () {
         'admin' => redirect()->route('admin.dashboard'),
         'pharmacist' => redirect()->route('pharmacist.dashboard'),
         'buyer' => redirect()->route('user.dashboard'),
-        default => redirect()->route('home')
+        // default => redirect()->route('home')
     };
 })->name('dashboard')->middleware('auth');
 

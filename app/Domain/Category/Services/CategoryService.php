@@ -28,7 +28,7 @@ class CategoryService
     public function updateCategory(int $id, array $data): Category
     {
         $category = $this->categoryRepository->findById($id);
-        
+
         if (!$category) {
             throw new \InvalidArgumentException('Category not found');
         }
@@ -49,7 +49,7 @@ class CategoryService
     public function deleteCategory(int $id): bool
     {
         $category = $this->categoryRepository->findById($id);
-        
+
         if (!$category) {
             throw new \InvalidArgumentException('Category not found');
         }
@@ -124,8 +124,8 @@ class CategoryService
             'categories_with_medicines' => $categoriesWithMedicines->count(),
             'empty_categories' => $emptyCategories->count(),
             'top_categories' => $topCategories,
-            'average_medicines_per_category' => $allCategories->count() > 0 
-                ? $categoriesWithMedicines->avg('medicines_count') ?? 0 
+            'average_medicines_per_category' => $allCategories->count() > 0
+                ? $categoriesWithMedicines->avg('medicines_count') ?? 0
                 : 0,
         ];
     }
@@ -133,7 +133,7 @@ class CategoryService
     private function validateCategoryData(array $data): void
     {
         $requiredFields = ['category_name'];
-        
+
         foreach ($requiredFields as $field) {
             if (!isset($data[$field]) || empty($data[$field])) {
                 throw new \InvalidArgumentException("Field {$field} is required");
@@ -148,4 +148,4 @@ class CategoryService
             throw new \InvalidArgumentException('Category name cannot exceed 255 characters');
         }
     }
-} 
+}

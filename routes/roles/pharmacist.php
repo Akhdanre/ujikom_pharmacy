@@ -1,7 +1,7 @@
 <?php
 
-use App\Http\Controllers\Web\MedicineController;
-use App\Http\Controllers\Web\SellTransactionController;
+use App\Http\Controllers\Medicine\MedicineController;
+use App\Http\Controllers\SellTransaction\SellTransactionController;
 use Illuminate\Support\Facades\Route;
 
 // Pharmacist Routes

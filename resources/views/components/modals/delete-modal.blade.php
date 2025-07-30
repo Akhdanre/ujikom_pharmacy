@@ -1,4 +1,8 @@
-@props(['id' => 'deleteModal', 'title' => 'Confirm Delete', 'message' => 'Are you sure you want to delete this item? This action cannot be undone.'])
+@props([
+    'id' => 'deleteModal',
+    'title' => 'Confirm Delete',
+    'message' => 'Are you sure you want to delete this item? This action cannot be undone.',
+])
 
 <div class="modal fade" id="{{ $id }}" tabindex="-1">
     <div class="modal-dialog">
@@ -20,4 +24,4 @@
             </div>
         </div>
     </div>
-</div> 
+</div>

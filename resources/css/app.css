@@ -3,6 +3,9 @@
 
 /* Design Tokens */
 @import "./tokens/colors.css";
+@import "./tokens/radius.css";
+@import "./tokens/spacing.css";
+@import "./tokens/transition.css";
 
 /* Base Styles */
 @import "./base/reset.css";
@@ -11,6 +14,7 @@
 /* Utilities */
 @import "./utilities/colors.css";
 @import "./utilities/header.css";
+@import "./utilities/footer.css";
 
 /* Components */
 @import "./components/buttons.css";
@@ -19,7 +23,7 @@
 @import "./components/sidebar.css";
 @import "./components/dropdown.css";
 @import "./components/image.css";
-@import "./components/teks.css";
+@import "./components/text.css";
 
 /* Bootstrap Overrides */
 @import "./override/bootstrap.css";
