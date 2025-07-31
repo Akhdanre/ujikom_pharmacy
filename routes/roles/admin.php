@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware(['auth', 'admin'])->group(function () {
     // Admin Dashboard
     Route::get('/admin/dashboard', function () {
-        return view('pages.admin.dashboard');
+        return view('pages.dashboard.index');
     })->name('admin.dashboard');
 
     // Medicine Management (Full access)

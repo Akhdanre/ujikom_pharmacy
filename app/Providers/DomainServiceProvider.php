@@ -9,6 +9,8 @@ use App\Domain\Sales\Repositories\SalesTransactionRepositoryInterface;
 use App\Domain\Shipping\Repositories\ShippingRepositoryInterface;
 use App\Domain\Payment\Repositories\PaymentRepositoryInterface;
 use App\Domain\User\Repositories\UserRepositoryInterface;
+use App\Domain\Auth\Services\AuthService;
+use App\Application\Services\AdminAuthApplicationService;
 use App\Infrastructure\Persistence\EloquentMedicineRepository;
 use App\Infrastructure\Persistence\EloquentCategoryRepository;
 use App\Infrastructure\Persistence\EloquentPurchaseTransactionRepository;
@@ -33,6 +35,10 @@ class DomainServiceProvider extends ServiceProvider
         $this->app->bind(SalesTransactionRepositoryInterface::class, EloquentSalesTransactionRepository::class);
         $this->app->bind(ShippingRepositoryInterface::class, EloquentShippingRepository::class);
         $this->app->bind(PaymentRepositoryInterface::class, EloquentPaymentRepository::class);
+
+        // Service Bindings
+        $this->app->singleton(AuthService::class);
+        $this->app->singleton(AdminAuthApplicationService::class);
     }
 
     /**

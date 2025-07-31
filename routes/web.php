@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Auth\AdminLoginController;
 use App\Http\Controllers\UserHomeController;
 use App\Http\Controllers\Ecommerce\HomeController;
 use App\Http\Controllers\Ecommerce\ProductsController;
@@ -10,6 +11,16 @@ use App\Http\Controllers\Ecommerce\AboutController;
 use App\Http\Controllers\Ecommerce\ContactController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SaleController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -52,23 +63,46 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [RegisterController::class, 'register']);
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+// Admin Auth Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [AdminLoginController::class, 'index'])->name('admin.login');
+    Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
+});
 
-// Role-based redirect after login
-Route::get('/dashboard', function () {
-    $user = Auth::user();
+Route::middleware('auth')->group(function () {
+    Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
+    
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Medicines
+    Route::resource('medicines', MedicineController::class);
+    
+    // Categories
+    Route::resource('categories', CategoryController::class);
+    
+    // Customers
+    Route::resource('customers', CustomerController::class);
+    
+    // Sales
+    Route::resource('sales', SaleController::class);
+    
+    // Purchases
+    Route::resource('purchases', PurchaseController::class);
+    
+    // Inventory
+    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
+    
+    // Reports
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    
+    // Users
+    Route::resource('users', UserController::class);
+    
+    // Settings
+    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+});
 
-    if (!$user) {
-        return redirect()->route('login');
-    }
-
-    return match ($user->role) {
-        'admin' => redirect()->route('admin.dashboard'),
-        'pharmacist' => redirect()->route('pharmacist.dashboard'),
-        'buyer' => redirect()->route('user.dashboard'),
-        // default => redirect()->route('home')
-    };
-})->name('dashboard')->middleware('auth');
 
 // Include role-based routes
 require __DIR__ . '/roles/user.php';

@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $medicine['name'] }} - {{ config('app.name', 'Apotek Sehat') }}</title>
-    
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
+
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <!-- Livewire Styles -->
     @livewireStyles
 </head>
-<body class="font-sans antialiased bg-gray-50">
+<body class="font-sans antialiased bg-gray-50">s
     <!-- Navigation -->
     <nav class="bg-white shadow-lg">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,7 +31,7 @@
                         <span class="ml-2 text-xl font-bold text-gray-900">Apotek Sehat</span>
                     </a>
                 </div>
-                
+
                 <div class="flex items-center space-x-4">
                     <a href="{{ route('home') }}" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
                         Kembali ke Beranda
@@ -149,7 +149,7 @@
                             <p class="text-sm text-gray-500">Untuk pemesanan, silakan hubungi admin</p>
                             <p class="text-sm text-gray-500">Telp: (021) 123-4567</p>
                         </div>
-                        <a href="{{ route('login') }}" 
+                        <a href="{{ route('login') }}"
                            class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-md font-medium">
                             Hubungi Admin
                         </a>
@@ -178,7 +178,7 @@
                             <span class="text-lg font-bold text-green-600">{{ $related->getFormattedPrice() }}</span>
                             <span class="text-sm text-gray-500">Stok: {{ $related->stock_quantity }}</span>
                         </div>
-                        <a href="{{ route('medicine.detail', $related->id) }}" 
+                        <a href="{{ route('medicine.detail', $related->id) }}"
                            class="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-md font-medium">
                             Lihat Detail
                         </a>
@@ -233,4 +233,4 @@
     <!-- Livewire Scripts -->
     @livewireScripts
 </body>
-</html> 
+</html>
