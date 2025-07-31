@@ -16,6 +16,7 @@
     rel="stylesheet">
 @vite(entrypoints: ['resources/css/style.css', 'resources/js/app.js'])
 
+@livewireStyles
 
 <!-- =======================================================
   * Template Name: NiceAdmin

@@ -31,6 +31,8 @@ interface MedicineRepositoryInterface
     
     public function getAll(): Collection;
     
+    public function getAllPaginated(int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator;
+    
     public function search(string $query): Collection;
     
     public function getByPriceRange(float $minPrice, float $maxPrice): Collection;

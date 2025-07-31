@@ -26,7 +26,8 @@ class EloquentMedicineRepository implements MedicineRepositoryInterface
     
     public function findActive(): Collection
     {
-        return Medicine::where('expired_at', '>', now())
+        return Medicine::with('category')
+            ->where('expired_at', '>', now())
             ->orWhereNull('expired_at')
             ->get();
     }
@@ -71,7 +72,14 @@ class EloquentMedicineRepository implements MedicineRepositoryInterface
     
     public function getAll(): Collection
     {
-        return Medicine::all();
+        return Medicine::with('category')->orderBy('created_at', 'desc')->get();
+    }
+
+    public function getAllPaginated(int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        return Medicine::with('category')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
     
     public function search(string $query): Collection

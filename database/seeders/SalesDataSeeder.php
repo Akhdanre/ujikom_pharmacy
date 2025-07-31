@@ -4,25 +4,18 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
-use App\Models\Medicine;
-use App\Models\SalesTransaction;
-use App\Models\SalesTransactionDetail;
+use App\Domain\Medicine\Entities\Medicine;
+use App\Domain\Sales\Entities\SalesTransaction;
+use App\Domain\Sales\Entities\SalesTransactionDetail;
 use Carbon\Carbon;
 
-class DatabaseSeeder extends Seeder
+class SalesDataSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        // Call other seeders
-        $this->call([
-            AdminSeeder::class,
-            CategorySeeder::class,
-            MedicineSeeder::class,
-        ]);
-
         // Create dummy sales transactions for the last 7 days
         $this->createDummySalesData();
     }
@@ -32,17 +25,19 @@ class DatabaseSeeder extends Seeder
         // Get some medicines
         $medicines = Medicine::all();
         if ($medicines->isEmpty()) {
+            $this->command->info('No medicines found. Please run MedicineSeeder first.');
             return;
         }
 
         // Get or create a customer user
-        $customer = User::where('role', 'customer')->first();
+        $customer = User::where('role', 'buyer')->first();
         if (!$customer) {
             $customer = User::create([
+                'username' => 'customer_test',
                 'name' => 'Customer Test',
                 'email' => 'customer@test.com',
                 'password' => bcrypt('password'),
-                'role' => 'customer'
+                'role' => 'buyer'
             ]);
         }
 
@@ -85,5 +80,7 @@ class DatabaseSeeder extends Seeder
                 $transaction->update(['total_price' => $totalPrice]);
             }
         }
+
+        $this->command->info('Dummy sales data created successfully!');
     }
-}
+} 

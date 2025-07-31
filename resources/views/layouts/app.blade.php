@@ -15,6 +15,8 @@
 
     @include('partials.footer')
     {{-- @include('partials.scripts') --}}
+    
+    @livewireScripts
 </body>
 
 </html>

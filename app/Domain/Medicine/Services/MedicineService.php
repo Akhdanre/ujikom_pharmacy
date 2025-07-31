@@ -5,18 +5,24 @@ namespace App\Domain\Medicine\Services;
 use App\Domain\Medicine\Entities\Medicine;
 use App\Domain\Medicine\Repositories\MedicineRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use PhpParser\Node\Expr\List_;
 
-class MedicineService
-{
+class MedicineService {
     public function __construct(
         private MedicineRepositoryInterface $medicineRepository
-    ) {}
+    ) {
+    }
 
-    public function createMedicine(array $data): Medicine
+
+    public function getAllMedicinesPaginated(int $perPage = 15, int $page = 1): \Illuminate\Pagination\LengthAwarePaginator
     {
+        return $this->medicineRepository->getAllPaginated($perPage, $page);
+    }
+
+    public function createMedicine(array $data): Medicine {
         // Validate business rules
         $this->validateMedicineData($data);
-        
+
         // Check if medicine name already exists
         if ($this->medicineRepository->findByName($data['medicine_name'])->isNotEmpty()) {
             throw new \InvalidArgumentException('Medicine name already exists');
@@ -26,10 +32,9 @@ class MedicineService
         return $this->medicineRepository->save($medicine);
     }
 
-    public function updateMedicine(int $id, array $data): Medicine
-    {
+    public function updateMedicine(int $id, array $data): Medicine {
         $medicine = $this->medicineRepository->findById($id);
-        
+
         if (!$medicine) {
             throw new \InvalidArgumentException('Medicine not found');
         }
@@ -49,10 +54,9 @@ class MedicineService
         return $this->medicineRepository->save($medicine);
     }
 
-    public function deleteMedicine(int $id): bool
-    {
+    public function deleteMedicine(int $id): bool {
         $medicine = $this->medicineRepository->findById($id);
-        
+
         if (!$medicine) {
             throw new \InvalidArgumentException('Medicine not found');
         }
@@ -65,10 +69,9 @@ class MedicineService
         return $this->medicineRepository->delete($medicine);
     }
 
-    public function adjustStock(int $medicineId, int $quantity, string $type = 'add'): Medicine
-    {
+    public function adjustStock(int $medicineId, int $quantity, string $type = 'add'): Medicine {
         $medicine = $this->medicineRepository->findById($medicineId);
-        
+
         if (!$medicine) {
             throw new \InvalidArgumentException('Medicine not found');
         }
@@ -84,10 +87,9 @@ class MedicineService
         return $this->medicineRepository->save($medicine);
     }
 
-    public function updatePrice(int $medicineId, float $newPrice): Medicine
-    {
+    public function updatePrice(int $medicineId, float $newPrice): Medicine {
         $medicine = $this->medicineRepository->findById($medicineId);
-        
+
         if (!$medicine) {
             throw new \InvalidArgumentException('Medicine not found');
         }
@@ -96,57 +98,47 @@ class MedicineService
         return $this->medicineRepository->save($medicine);
     }
 
-    public function getLowStockMedicines(int $threshold = 10): Collection
-    {
+    public function getLowStockMedicines(int $threshold = 10): Collection {
         return $this->medicineRepository->findLowStock($threshold);
     }
 
-    public function getOutOfStockMedicines(): Collection
-    {
+    public function getOutOfStockMedicines(): Collection {
         return $this->medicineRepository->findOutOfStock();
     }
 
-    public function getExpiredMedicines(): Collection
-    {
+    public function getExpiredMedicines(): Collection {
         return $this->medicineRepository->findExpired();
     }
 
-    public function getExpiringSoonMedicines(int $days = 30): Collection
-    {
+    public function getExpiringSoonMedicines(int $days = 30): Collection {
         return $this->medicineRepository->findExpiringSoon($days);
     }
 
-    public function searchMedicines(string $query): Collection
-    {
+    public function searchMedicines(string $query): Collection {
         return $this->medicineRepository->search($query);
     }
 
-    public function getMedicinesByCategory(int $categoryId): Collection
-    {
+    public function getMedicinesByCategory(int $categoryId): Collection {
         return $this->medicineRepository->findByCategory($categoryId);
     }
 
-    public function getActiveMedicines(): Collection
-    {
+    public function getActiveMedicines(): Collection {
         return $this->medicineRepository->findActive();
     }
 
-    public function getInactiveMedicines(): Collection
-    {
+    public function getInactiveMedicines(): Collection {
         return $this->medicineRepository->findInactive();
     }
 
-    public function calculateTotalInventoryValue(): float
-    {
+    public function calculateTotalInventoryValue(): float {
         $medicines = $this->medicineRepository->findActive();
-        
+
         return $medicines->sum(function ($medicine) {
             return $medicine->price * $medicine->stock;
         });
     }
 
-    public function getInventoryReport(): array
-    {
+    public function getInventoryReport(): array {
         $activeMedicines = $this->medicineRepository->findActive();
         $lowStockMedicines = $this->medicineRepository->findLowStock();
         $outOfStockMedicines = $this->medicineRepository->findOutOfStock();
@@ -164,43 +156,37 @@ class MedicineService
         ];
     }
 
-    public function getPublicMedicines(string $search = '', ?int $categoryId = null): Collection
-    {
+    public function getPublicMedicines(string $search = '', ?int $categoryId = null): Collection {
         $query = $this->medicineRepository->findActive();
-        
+
         if ($search) {
             $query = $this->medicineRepository->search($search);
         }
-        
+
         if ($categoryId) {
             $query = $this->medicineRepository->findByCategory($categoryId);
         }
-        
+
         return $query;
     }
 
-    public function getTopSellingMedicines(int $limit = 10): Collection
-    {
+    public function getTopSellingMedicines(int $limit = 10): Collection {
         return $this->medicineRepository->getTopSelling($limit);
     }
 
-    public function getLowestStockMedicines(int $limit = 10): Collection
-    {
+    public function getLowestStockMedicines(int $limit = 10): Collection {
         return $this->medicineRepository->getLowestStock($limit);
     }
 
-    public function getMedicinesByPriceRange(float $minPrice, float $maxPrice): Collection
-    {
+    public function getMedicinesByPriceRange(float $minPrice, float $maxPrice): Collection {
         return $this->medicineRepository->getByPriceRange($minPrice, $maxPrice);
     }
 
-    public function getMedicinesByStockRange(int $minStock, int $maxStock): Collection
-    {
+    public function getMedicinesByStockRange(int $minStock, int $maxStock): Collection {
         return $this->medicineRepository->getByStockRange($minStock, $maxStock);
     }
 
-    public function getRelatedMedicines(int $medicineId): Collection
-    {
+    public function getRelatedMedicines(int $medicineId): Collection {
         $medicine = $this->medicineRepository->findById($medicineId);
         if (!$medicine) {
             return collect();
@@ -211,40 +197,33 @@ class MedicineService
             ->take(4);
     }
 
-    public function updateStock(int $medicineId, int $quantity): bool
-    {
+    public function updateStock(int $medicineId, int $quantity): bool {
         return $this->medicineRepository->updateStock($medicineId, $quantity);
     }
 
-    public function getTotalStock(): int
-    {
+    public function getTotalStock(): int {
         return $this->medicineRepository->getTotalStock();
     }
 
-    public function getAveragePrice(): float
-    {
+    public function getAveragePrice(): float {
         return $this->medicineRepository->getAveragePrice();
     }
 
-    public function getMostExpensiveMedicine(): ?Medicine
-    {
+    public function getMostExpensiveMedicine(): ?Medicine {
         return $this->medicineRepository->getMostExpensive();
     }
 
-    public function getLeastExpensiveMedicine(): ?Medicine
-    {
+    public function getLeastExpensiveMedicine(): ?Medicine {
         return $this->medicineRepository->getLeastExpensive();
     }
 
-    public function findById(int $id): ?Medicine
-    {
+    public function findById(int $id): ?Medicine {
         return $this->medicineRepository->findById($id);
     }
 
-    private function validateMedicineData(array $data): void
-    {
+    private function validateMedicineData(array $data): void {
         $requiredFields = ['medicine_name', 'price', 'stock', 'category_id'];
-        
+
         foreach ($requiredFields as $field) {
             if (!isset($data[$field])) {
                 throw new \InvalidArgumentException("Field {$field} is required");
@@ -269,4 +248,4 @@ class MedicineService
             }
         }
     }
-} 
+}

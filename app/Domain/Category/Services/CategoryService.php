@@ -67,6 +67,11 @@ class CategoryService
         return $this->categoryRepository->findById($id);
     }
 
+    public function findByName(string $name): ?Category
+    {
+        return $this->categoryRepository->findByName($name);
+    }
+
     public function getAllCategories(): Collection
     {
         return $this->categoryRepository->getAll();

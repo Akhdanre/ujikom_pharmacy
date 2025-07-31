@@ -43,8 +43,8 @@ class CategoryApplicationService
 
     public function getActiveCategories(): array
     {
-        $categories = $this->categoryService->getActiveCategories();
-        return $categories->map(fn($category) => $this->entityToDTO($category))->toArray();
+        // Since we don't have active/inactive status, return all categories
+        return $this->getAllCategories();
     }
 
     public function getCategoryById(int $id): ?CategoryDTO
@@ -61,7 +61,8 @@ class CategoryApplicationService
 
     public function getPopularCategories(int $limit = 6): array
     {
-        $categories = $this->categoryService->getPopularCategories($limit);
+        // Use top categories instead since getPopularCategories doesn't exist
+        $categories = $this->categoryService->getTopCategories($limit);
         return $categories->map(fn($category) => $this->entityToDTO($category))->toArray();
     }
 
@@ -85,70 +86,22 @@ class CategoryApplicationService
         ];
     }
 
-    public function getCategoryHierarchy(): array
-    {
-        $categories = $this->categoryService->getAllCategories();
-        return $this->buildHierarchy($categories);
-    }
-
-    public function getCategoryTree(): array
-    {
-        $categories = $this->categoryService->getAllCategories();
-        return $this->buildTree($categories);
-    }
-
-    public function getCategoryPath(int $categoryId): array
-    {
-        $category = $this->categoryService->findById($categoryId);
-        if (!$category) {
-            return [];
-        }
-
-        $path = [];
-        $currentCategory = $category;
-
-        while ($currentCategory) {
-            array_unshift($path, $this->entityToDTO($currentCategory));
-            $currentCategory = $currentCategory->parent;
-        }
-
-        return $path;
-    }
-
-    public function getSubcategories(int $parentId): array
-    {
-        $subcategories = $this->categoryService->getSubcategories($parentId);
-        return $subcategories->map(fn($category) => $this->entityToDTO($category))->toArray();
-    }
-
-    public function getParentCategories(): array
-    {
-        $parentCategories = $this->categoryService->getParentCategories();
-        return $parentCategories->map(fn($category) => $this->entityToDTO($category))->toArray();
-    }
-
     public function getCategoryByName(string $name): ?CategoryDTO
     {
         $category = $this->categoryService->findByName($name);
         return $category ? $this->entityToDTO($category) : null;
     }
 
-    public function getCategoryBySlug(string $slug): ?CategoryDTO
-    {
-        $category = $this->categoryService->findBySlug($slug);
-        return $category ? $this->entityToDTO($category) : null;
-    }
-
     public function getCategoriesForNavigation(): array
     {
-        $categories = $this->categoryService->getActiveCategories();
-        return $categories->map(fn($category) => $this->entityToDTO($category))->toArray();
+        // Since we don't have active/inactive status, return all categories
+        return $this->getAllCategories();
     }
 
     public function getFeaturedCategories(int $limit = 4): array
     {
-        $categories = $this->categoryService->getActiveCategories()->take($limit);
-        return $categories->map(fn($category) => $this->entityToDTO($category))->toArray();
+        // Since we don't have active/inactive status, return top categories
+        return $this->getPopularCategories($limit);
     }
 
     public function getCategoriesWithFilters(array $filters): array
@@ -158,15 +111,15 @@ class CategoryApplicationService
         // Apply search filter
         if (!empty($filters['search'])) {
             $categories = $categories->filter(function($category) use ($filters) {
-                return stripos($category->name, $filters['search']) !== false ||
+                return stripos($category->category_name, $filters['search']) !== false ||
                        stripos($category->description, $filters['search']) !== false;
             });
         }
         
-        // Apply status filter
-        if (!empty($filters['status'])) {
-            $categories = $categories->where('is_active', $filters['status'] === 'active');
-        }
+        // Apply status filter - Since we don't have is_active field, we'll skip this for now
+        // if (!empty($filters['status'])) {
+        //     $categories = $categories->where('is_active', $filters['status'] === 'active');
+        // }
         
         // Apply sorting
         if (!empty($filters['sort'])) {
@@ -185,41 +138,5 @@ class CategoryApplicationService
         return CategoryDTO::fromArray($category->toArray());
     }
 
-    private function buildHierarchy(Collection $categories, ?int $parentId = null): array
-    {
-        $hierarchy = [];
-        
-        foreach ($categories as $category) {
-            if ($category->parent_id === $parentId) {
-                $categoryData = $this->entityToDTO($category);
-                $categoryData['children'] = $this->buildHierarchy($categories, $category->id);
-                $hierarchy[] = $categoryData;
-            }
-        }
-        
-        return $hierarchy;
-    }
 
-    private function buildTree(Collection $categories): array
-    {
-        $tree = [];
-        $lookup = [];
-        
-        // Create lookup table
-        foreach ($categories as $category) {
-            $lookup[$category->id] = $this->entityToDTO($category);
-            $lookup[$category->id]['children'] = [];
-        }
-        
-        // Build tree
-        foreach ($categories as $category) {
-            if ($category->parent_id === null) {
-                $tree[] = &$lookup[$category->id];
-            } else {
-                $lookup[$category->parent_id]['children'][] = &$lookup[$category->id];
-            }
-        }
-        
-        return $tree;
-    }
 } 
