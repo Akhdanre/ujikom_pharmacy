@@ -69,44 +69,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/admin/login', [AdminLoginController::class, 'login'])->name('admin.login.submit');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::post('/admin/logout', [AdminLoginController::class, 'logout'])->name('admin.logout');
-    
-    // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Medicines
-    Route::resource('medicines', MedicineController::class);
-    
-    // Categories
-    Route::resource('categories', CategoryController::class);
-    
-    // Customers
-    Route::resource('customers', CustomerController::class);
-    
-    // Sales
-    Route::resource('sales', SaleController::class);
-    
-    // Purchases
-    Route::resource('purchases', PurchaseController::class);
-    
-    // Inventory
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    
-    // Reports
-    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-    
-    // Users
-    Route::resource('users', UserController::class);
-    
-    // Settings
-    Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
-});
+
+Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
 
-// Include role-based routes
-require __DIR__ . '/roles/user.php';
-require __DIR__ . '/roles/pharmacist.php';
-require __DIR__ . '/roles/admin.php';
 
 require __DIR__ . '/auth.php';
